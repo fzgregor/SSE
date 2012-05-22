@@ -1,0 +1,10 @@
+wie funktioniert der bildaufbau (vga)?
+
+die vga komponente geht ueber alle pixel des bildschirms.
+diese position wird an saemtliche sichtbaren komponenten (ball, paddle, block) gegeben.
+die sichtbare komponente berechnet den rgb wert fuer die gegebene position.
+wenn die komponente fuer die position keinen rgb wert hat wird der alpha wert auf eins gesetzt.
+im rgba-combiner werden die rgba werte saemtlicher sichtbaren komponenten zu einem einzigem rgba wert zusammengefasst.
+WICHTIG: zum kombinieren hat die rgba-combiner komponente nur zeit bis die vga komponente ein neues pixelsignal anlegt
+und der kombinierte rgb wert wird an die vga komponente zurueckgegeben.
+
