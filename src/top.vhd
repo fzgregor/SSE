@@ -129,5 +129,21 @@ begin
 		port map(ball_position    => ball_position,
 			     ball_radius      => ball_radius,
 			     collision_vector => collision_summary_vector(5 downto 4));
+	rgba_combiner_inst : combiner
+		generic map(set_number  => 3,
+			        set_length  => 4,
+			        alpha_index => 3)
+		port map(clk    => clk,
+			     rst    => rst,
+			     input  => rgba_summary_vector,
+			     output => rgba);
+	collision_combiner_inst : combiner
+		generic map(set_number  => 3,
+			        set_length  => 2,
+			        alpha_index => -1)
+		port map(clk    => clk,
+			     rst    => rst,
+			     input  => collision_summary_vector,
+			     output => collision_vector);
 	
 end architecture RTL;

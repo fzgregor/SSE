@@ -16,7 +16,7 @@ entity ball is
 		set_ball_position : in position;
 		dead : out std_logic; -- indicates ball death
 		ball_position : out position; -- current middle point of ball
-		ball_radius : in radius;
+		ball_radius : out radius;
 		collision_vector : in collision_vector
 	);
 end entity ball;
@@ -32,7 +32,7 @@ architecture RTL of ball is
 			 rgba              : out rgba);
 	end component visible_box;
 	
-	signal ball_size : size := (x=>TO_UNSIGNED(10, 10), y=>TO_UNSIGNED(10, 9));	
+	signal ball_size : size := (x=>TO_UNSIGNED(10, size.x'length), y=>TO_UNSIGNED(10, size.y'length));	
 begin
 	visible_box_inst : visible_box
 		generic map(size => ball_size)
@@ -42,5 +42,7 @@ begin
 			     position          => position,
 			     flatted_rgab      => X"",
 			     rgba              => rgba);
+
+ball_radius <= TO_UNSIGNED(5, ball_radius'length);
 
 end architecture RTL;

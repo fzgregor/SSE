@@ -47,7 +47,7 @@ architecture RTL of paddle is
 	
 	type paddleState is (ball_catched, normal);
 	signal current_position : position; -- left upper corner of paddle
-	signal paddle_size : size := (x=>TO_UNSIGNED(1,9), y=>TO_UNSIGNED(6, 8));
+	signal paddle_size : size := (x=>TO_UNSIGNED(1, size.x'length), y=>TO_UNSIGNED(6, size.y'length));
 begin
 	visible_box_inst : visible_box
 		generic map(size => paddle_size)
