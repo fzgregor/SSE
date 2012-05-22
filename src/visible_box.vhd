@@ -11,7 +11,7 @@ entity visible_box is
 		rst : in std_logic;
 		rgba_for_position : in position;
 		position : in position;
-		flatted_rgab : in std_logic_vector (0 to size.x * size.y);
+		flatted_rgba : in std_logic_vector (0 to size.x * size.y);
 		rgba : out rgba
 	);
 end entity visible_box;

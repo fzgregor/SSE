@@ -31,7 +31,7 @@ architecture RTL of paddle is
 			 rst               : in  std_logic;
 			 rgba_for_position : in  position;
 			 position          : in  position;
-			 flatted_rgab      : in  std_logic_vector(0 to size.x * size.y);
+			 flatted_rgba      : in  std_logic_vector(0 to size.x * size.y);
 			 rgba              : out rgba);
 	end component visible_box;
 	
@@ -47,7 +47,7 @@ architecture RTL of paddle is
 	
 	type paddleState is (ball_catched, normal);
 	signal current_position : position; -- left upper corner of paddle
-	signal paddle_size : size := (x=>TO_UNSIGNED(1, size.x'length), y=>TO_UNSIGNED(6, size.y'length));
+	signal paddle_size : size := (x=>TO_UNSIGNED(10, size.x'length), y=>TO_UNSIGNED(1, size.y'length));
 begin
 	visible_box_inst : visible_box
 		generic map(size => paddle_size)
@@ -55,7 +55,7 @@ begin
 			     rst               => rst,
 			     rgba_for_position => rgba_for_position,
 			     position          => current_position,
-			     flatted_rgab      => x"F", -- <----- 1 * 6 rgba wert 
+			     flatted_rgba      => x"4444444444", 
 			     rgba              => rgba);
 	collision_box_inst : collision_box
 		port map(clk              => clk,

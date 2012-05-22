@@ -27,7 +27,7 @@ architecture RTL of brick is
 			 rst               : in  std_logic;
 			 rgba_for_position : in  position;
 			 position          : in  position;
-			 flatted_rgab      : in  std_logic_vector(0 to size.x * size.y);
+			 flatted_rgba      : in  std_logic_vector(0 to size.x * size.y);
 			 rgba              : out rgba);
 	end component visible_box;
 	
@@ -41,7 +41,7 @@ architecture RTL of brick is
 			 collision_vector : out collision_vector);
 	end component collision_box;
 	
-	signal brick_size : size := (x=>TO_UNSIGNED(1,9), y=>TO_UNSIGNED(6, 8));
+	signal brick_size : size := (x=>TO_UNSIGNED(35, size.x'length), y=>TO_UNSIGNED(1, size.y'length));
 begin
 	visible_box_inst : visible_box
 		generic map(size => brick_size)
@@ -49,7 +49,7 @@ begin
 			     rst               => rst,
 			     rgba_for_position => rgba_for_position,
 			     position          => brick_position,
-			     flatted_rgab      => x"F", -- <----- 1 * 6 rgba wert 
+			     flatted_rgba      => x"88888888888888888888888888888888888",
 			     rgba              => rgba);
 	collision_box_inst : collision_box
 		port map(clk              => clk,

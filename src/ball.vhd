@@ -28,7 +28,7 @@ architecture RTL of ball is
 			 rst               : in  std_logic;
 			 rgba_for_position : in  position;
 			 position          : in  position;
-			 flatted_rgab      : in  std_logic_vector(0 to size.x * size.y);
+			 flatted_rgba      : in  std_logic_vector(0 to size.x * size.y);
 			 rgba              : out rgba);
 	end component visible_box;
 	
@@ -40,7 +40,7 @@ begin
 			     rst               => rst,
 			     rgba_for_position => rgba_for_position,
 			     position          => position,
-			     flatted_rgab      => X"",
+			     flatted_rgba      => X"put here 100 rgba values",
 			     rgba              => rgba);
 
 ball_radius <= TO_UNSIGNED(5, ball_radius'length);
