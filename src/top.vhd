@@ -71,6 +71,16 @@ component combiner
 		 input  : in  std_logic_vector(set_number * set_length - 1 downto 0);
 		 output : out std_logic_vector(set_length - 1 downto 0));
 end component combiner;
+component ps2_uart
+	port(rst, clk   : in    std_logic;
+		 ps2_clk    : inout std_logic;
+		 ps2_dat    : inout std_logic;
+		 snd_ready  : out   std_logic;
+		 snd_strobe : in    std_logic;
+		 snd_data   : in    std_logic_vector(7 downto 0);
+		 rcv_strobe : out   std_logic;
+		 rcv_data   : out   std_logic_vector(7 downto 0));
+end component ps2_uart;
 
 
 signal game_clk : std_logic := '1';
@@ -86,9 +96,20 @@ signal rgba_summary_vector : std_logic_vector(11 downto 0);
 signal rgba : std_logic_vector(3 downto 0);
 signal vga_pixel : position;
 signal ps2_data : std_logic_vector(7 downto 0);
+signal ps2_strobe : std_logic;
 
 
 begin
+	ps2_uart_inst : ps2_uart
+		port map(rst        => rst,
+			     clk        => clk,
+			     ps2_clk    => ps2_clk,
+			     ps2_dat    => ps2_data_raw,
+			     snd_ready  => open,
+			     snd_strobe => open,
+			     snd_data   => open,
+			     rcv_strobe => ps2_strobe,
+			     rcv_data   => ps2_data);
 	ball_inst : ball
 		port map(clk               => clk,
 			     rst               => rst,
