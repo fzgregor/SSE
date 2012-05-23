@@ -9,40 +9,25 @@ entity ball is
 		rst : in std_logic;
 		game_clk : in std_logic; -- next game action
 		-- visible representation
-		rgba_for_position : in position;
-		rgba : out rgba;
+		rgba_for_position : in positionT;
+		rgba : out rgbaT;
 		-- set position of ball
 		set_ball_active : in std_logic;
-		set_ball_position : in position;
+		set_ball_position : in positionT;
 		dead : out std_logic; -- indicates ball death
-		ball_position : out position; -- current middle point of ball
-		ball_radius : out radius;
-		collision_vector : in collision_vector
+		ball_position : out positionT; -- current middle point of ball
+		ball_radius : out radiusT;
+		collision_vector : in collision_vectorT
 	);
 end entity ball;
 
 architecture RTL of ball is
-	component visible_box
-		generic(size : size);
-		port(clk               : in  std_logic;
-			 rst               : in  std_logic;
-			 rgba_for_position : in  position;
-			 position          : in  position;
-			 flatted_rgba      : in  std_logic_vector(0 to size.x * size.y);
-			 rgba              : out rgba);
-	end component visible_box;
 	
-	signal ball_size : size := (x=>TO_UNSIGNED(10, size.x'length), y=>TO_UNSIGNED(10, size.y'length));	
+   signal current_position : positionT;
+	
 begin
-	visible_box_inst : visible_box
-		generic map(size => ball_size)
-		port map(clk               => clk,
-			     rst               => rst,
-			     rgba_for_position => rgba_for_position,
-			     position          => position,
-			     flatted_rgba      => X"put here 100 rgba values",
-			     rgba              => rgba);
 
-ball_radius <= TO_UNSIGNED(5, ball_radius'length);
+	ball_radius <= TO_UNSIGNED(5, ball_radius'length);
+	rgba <= x"E";
 
 end architecture RTL;

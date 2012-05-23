@@ -22,25 +22,25 @@ component ball
 	port(clk               : in  std_logic;
 		 rst               : in  std_logic;
 		 game_clk          : in  std_logic;
-		 rgba_for_position : in  position;
-		 rgba              : out rgba;
+		 rgba_for_position : in  positionT;
+		 rgba              : out rgbaT;
 		 set_ball_active   : in  std_logic;
-		 set_ball_position : in  position;
+		 set_ball_position : in  positionT;
 		 dead              : out std_logic;
-		 ball_position     : out position;
-		 ball_radius	   : out radius;
-		 collision_vector  : in  collision_vector);
+		 ball_position     : out positionT;
+		 ball_radius	   : out radiusT;
+		 collision_vector  : in  collision_vectorT);
 end component ball;
 component brick
 	port(clk                     : in  std_logic;
 		 rst                     : in  std_logic;
 		 game_clk                : in  std_logic;
-		 brick_position          : in  position;
-		 rgba_for_position       : in  position;
-		 rgba                    : out rgba;
-		 ball_position           : in  position;
-		 ball_radius             : in  radius;
-		 paddle_collision_vector : out collision_vector);
+		 brick_position          : in  positionT;
+		 rgba_for_position       : in  positionT;
+		 rgba                    : out rgbaT;
+		 ball_position           : in  positionT;
+		 ball_radius             : in  radiusT;
+		 paddle_collision_vector : out collision_vectorT);
 end component brick;
 component paddle
 	port(clk                     : in  std_logic;
@@ -50,22 +50,22 @@ component paddle
 		 ps2_data                : in  std_logic_vector(7 downto 0);
 		 ps2_strobe              : in  std_logic;
 		 set_ball_strobe         : out std_logic;
-		 set_ball_position       : out position;
-		 rgba_for_position       : in  position;
-		 rgba                    : out rgba;
-		 ball_position           : in  position;
-		 ball_radius             : in  radius;
-		 paddle_collision_vector : out collision_vector);
+		 set_ball_position       : out positionT;
+		 rgba_for_position       : in  positionT;
+		 rgba                    : out rgbaT;
+		 ball_position           : in  positionT;
+		 ball_radius             : in  radiusT;
+		 paddle_collision_vector : out collision_vectorT);
 end component paddle;
 component screen
-	port(ball_position    : in  position;
-		 ball_radius      : in  radius;
-		 collision_vector : out collision_vector);
+	port(ball_position    : in  positionT;
+		 ball_radius      : in  radiusT;
+		 collision_vector : out collision_vectorT);
 end component screen;
 component combiner
 	generic(set_number  : natural;
 		    set_length  : natural;
-		    alpha_index : natural);
+		    alpha_index : integer);
 	port(clk    : in  std_logic;
 		 rst    : in  std_logic;
 		 input  : in  std_logic_vector(set_number * set_length - 1 downto 0);
@@ -90,8 +90,8 @@ end component clock_generator;
 component vga
 	port(clk25             : in  std_logic;
 		 reset             : in  std_logic;
-		 rgba_for_position : out position;
-		 rgba              : in  std_logic_vector(3 downto 0);
+		 rgba_for_position : out positionT;
+		 rgba              : in  rgbaT;
 		 rgb               : out std_logic_vector(2 downto 0);
 		 vga_hs            : out std_logic;
 		 vga_vs            : out std_logic);
@@ -100,17 +100,17 @@ end component vga;
 
 -- component connection signals
 signal set_ball_active : std_logic;
-signal set_ball_position : position;
+signal set_ball_position : positionT;
 signal catch_dead_ball : std_logic;
 -- collision stuff
-signal ball_position : position;
-signal ball_radius : radius;
+signal ball_position : positionT;
+signal ball_radius : radiusT;
 signal collision_summary_vector : std_logic_vector(5 downto 0);
 signal collision_vector : std_logic_vector(1 downto 0);
 -- graphic stuff
 signal rgba_summary_vector : std_logic_vector(11 downto 0);
 signal rgba : std_logic_vector(3 downto 0);
-signal vga_pixel : position;
+signal vga_pixel : positionT;
 -- ps2 stuff
 signal ps2_data : std_logic_vector(7 downto 0);
 signal ps2_strobe : std_logic;
@@ -126,8 +126,8 @@ begin
 			     ps2_clk    => ps2_clk,
 			     ps2_dat    => ps2_data_raw,
 			     snd_ready  => open,
-			     snd_strobe => open,
-			     snd_data   => open,
+			     snd_strobe => '0',
+			     snd_data   => "00000000",
 			     rcv_strobe => ps2_strobe,
 			     rcv_data   => ps2_data);
 	clock_generator_inst : clock_generator
@@ -153,7 +153,7 @@ begin
 			     set_ball_position => set_ball_position,
 			     dead              => catch_dead_ball,
 			     ball_position     => ball_position,
-			     ball_radius	   => ball_radius,
+			     ball_radius	     => ball_radius,
 			     collision_vector  => collision_vector);
 	paddle_inst : paddle
 		port map(clk                     => clk,
@@ -173,7 +173,7 @@ begin
 		port map(clk                     => clk,
 			     rst                     => rst,
 			     game_clk                => game_clk,
-			     brick_position          => (x=>TO_UNSIGNED(400, position.x'length), y=>TO_UNSIGNED(300, position.y'length)),
+			     brick_position          => (x=>TO_UNSIGNED(400, 10), y=>TO_UNSIGNED(300, 9)), --(x=>TO_UNSIGNED(400, positionT.x'length), y=>TO_UNSIGNED(300, positionT.y'length)),
 			     rgba_for_position       => vga_pixel,
 			     rgba                    => rgba_summary_vector(11 downto 8),
 			     ball_position           => ball_position,

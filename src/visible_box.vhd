@@ -4,15 +4,15 @@ use work.types.all;
 
 entity visible_box is
 	generic (
-		size : size -- define which size this visible box has
+		size : sizeT -- define which size this visible box has
 	);
 	port (
 		clk : in std_logic;
 		rst : in std_logic;
-		rgba_for_position : in position;
-		position : in position;
-		flatted_rgba : in std_logic_vector (0 to size.x * size.y);
-		rgba : out rgba
+		rgba_for_position : in positionT;
+		position : in positionT;
+		flatted_rgba : in std_logic_vector (0 to 5); -- should be size.x * size.y
+		rgba : out rgbaT
 	);
 end entity visible_box;
 

@@ -4,9 +4,9 @@ use work.types.all;
 
 entity screen is
 	port (
-		ball_position : in position;
-		ball_radius : in radius;
-		collision_vector : out collision_vector
+		ball_position : in positionT;
+		ball_radius : in radiusT;
+		collision_vector : out collision_vectorT
 	);
 end entity screen;
 

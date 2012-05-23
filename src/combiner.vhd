@@ -5,7 +5,7 @@ entity combiner is
 	generic (
 		set_number : natural; -- eg. number of rgba inputs
 		set_length : natural; -- eg. for rgba 4 for collision_vector 2
-		alpha_index : natural -- eg. for rgba 3 for collision_vector -1
+		alpha_index : integer -- eg. for rgba 3 for collision_vector -1
 	);
 	port (
 		clk : in std_logic;

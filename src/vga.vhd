@@ -35,9 +35,9 @@ entity vga is
  port ( 
         clk25 : in  STD_LOGIC;
         reset : in  STD_LOGIC;
-		rgba_for_position : out position;
+        rgba_for_position : out positionT;
         rgba : in  STD_LOGIC_VECTOR (3 downto 0);
-		rgb : out std_logic_vector (2 downto 0);
+        rgb : out std_logic_vector (2 downto 0);
         vga_hs : out  STD_LOGIC;
         vga_vs : out  STD_LOGIC
       );
@@ -46,7 +46,7 @@ end vga;
 architecture Behavioral of vga is
 
 signal cnt_h : unsigned (9 downto 0) := "0000000000";
-signal cnt_v : unsigned (8 downto 0) := "0000000000";
+signal cnt_v : unsigned (8 downto 0) := "000000000";
 signal visible : STD_LOGIC := '0';
 
 begin
@@ -55,7 +55,7 @@ visible <= '1' when cnt_h >= 144 and cnt_h <= 784 and cnt_v >= 31 and cnt_v <= 5
 rgba_for_position.x <= cnt_h - 144 when visible = '1' else (others => '0');
 rgba_for_position.y <= cnt_v - 31 when visible = '1' else (others => '0');
 
-rgb <= rgba(3 downto 1) when visible = '1' else '0';
+rgb <= rgba(3 downto 1) when visible = '1' else "000";
 
 vga_hs <= '0' when cnt_h >= 0 and cnt_h <= 95 else '1';
 vga_vs <= '0' when cnt_v >= 0 and cnt_v <= 2 else '1';

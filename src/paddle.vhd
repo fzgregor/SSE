@@ -12,51 +12,33 @@ entity paddle is
 		ps2_data : in std_logic_vector (7 downto 0);
 		ps2_strobe : in std_logic;
 		set_ball_strobe : out std_logic; -- indicate that set_ball is correct address
-		set_ball_position : out position;
+		set_ball_position : out positionT;
 		-- visible representation
-		rgba_for_position : in position;
-		rgba : out rgba;
+		rgba_for_position : in positionT;
+		rgba : out rgbaT;
 		-- collision detection
-		ball_position : in position;
-		ball_radius : in radius;
-		paddle_collision_vector : out collision_vector
+		ball_position : in positionT;
+		ball_radius : in radiusT;
+		paddle_collision_vector : out collision_vectorT
 	);
 end entity paddle;
 
 
 architecture RTL of paddle is
-	component visible_box
-		generic(size : size);
-		port(clk               : in  std_logic;
-			 rst               : in  std_logic;
-			 rgba_for_position : in  position;
-			 position          : in  position;
-			 flatted_rgba      : in  std_logic_vector(0 to size.x * size.y);
-			 rgba              : out rgba);
-	end component visible_box;
-	
 	component collision_box
 		port(clk              : in  std_logic;
 			 rst              : in  std_logic;
-			 position         : in  position;
-			 size             : in  size;
-			 ball_position    : in  position;
-			 ball_radius      : in  radius;
-			 collision_vector : out collision_vector);
+			 position         : in  positionT;
+			 size             : in  sizeT;
+			 ball_position    : in  positionT;
+			 ball_radius      : in  radiusT;
+			 collision_vector : out collision_vectorT);
 	end component collision_box;
 	
 	type paddleState is (ball_catched, normal);
-	signal current_position : position; -- left upper corner of paddle
-	signal paddle_size : size := (x=>TO_UNSIGNED(10, size.x'length), y=>TO_UNSIGNED(1, size.y'length));
+	signal current_position : positionT; -- left upper corner of paddle
+	signal paddle_size : sizeT; -- := (x=>TO_UNSIGNED(10, sizeT.x'length), y=>TO_UNSIGNED(1, sizeT.y'length));
 begin
-	visible_box_inst : visible_box
-		generic map(size => paddle_size)
-		port map(clk              => clk,
-			     rst               => rst,
-			     rgba_for_position => rgba_for_position,
-			     position          => current_position,
-			     flatted_rgba      => x"4444444444", 
-			     rgba              => rgba);
 	collision_box_inst : collision_box
 		port map(clk              => clk,
 			     rst              => rst,
@@ -66,4 +48,5 @@ begin
 			     ball_radius      => ball_radius,
 			     collision_vector => paddle_collision_vector);
 
+    rgba <= x"2";
 end architecture RTL;

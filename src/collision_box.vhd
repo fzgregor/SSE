@@ -7,11 +7,11 @@ entity collision_box is
 	port (
 		clk : in std_logic;
 		rst : in std_logic;
-		position : in position; -- left upper corner of this collision_box
-		size : in size;
-		ball_position : in position;
-		ball_radius : in radius;
-		collision_vector : out collision_vector
+		position : in positionT; -- left upper corner of this collision_box
+		size : in sizeT;
+		ball_position : in positionT;
+		ball_radius : in radiusT;
+		collision_vector : out collision_vectorT
 	);
 end entity collision_box;
 
