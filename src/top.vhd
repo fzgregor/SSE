@@ -87,6 +87,15 @@ component clock_generator
 		 game_clk  : out std_logic;
 		 clk_25mhz : out std_logic);
 end component clock_generator;
+component vga
+	port(clk25             : in  std_logic;
+		 reset             : in  std_logic;
+		 rgba_for_position : out position;
+		 rgba              : in  std_logic_vector(3 downto 0);
+		 rgb               : out std_logic_vector(2 downto 0);
+		 vga_hs            : out std_logic;
+		 vga_vs            : out std_logic);
+end component vga;
 
 
 -- component connection signals
@@ -126,6 +135,14 @@ begin
 			     rst       => rst,
 			     game_clk  => game_clk,
 			     clk_25mhz => clk_25mhz);
+	vga_inst : vga
+		port map(clk25             => clk_25mhz,
+			     reset             => rst,
+			     rgba_for_position => vga_pixel,
+			     rgba              => rgba,
+			     rgb               => rgb,
+			     vga_hs            => h_sync,
+			     vga_vs            => v_sync);
 	ball_inst : ball
 		port map(clk               => clk,
 			     rst               => rst,
