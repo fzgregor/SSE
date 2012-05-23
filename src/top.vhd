@@ -81,22 +81,33 @@ component ps2_uart
 		 rcv_strobe : out   std_logic;
 		 rcv_data   : out   std_logic_vector(7 downto 0));
 end component ps2_uart;
+component clock_generator
+	port(clk       : in  std_logic;
+		 rst       : in  std_logic;
+		 game_clk  : out std_logic;
+		 clk_25mhz : out std_logic);
+end component clock_generator;
 
 
-signal game_clk : std_logic := '1';
 -- component connection signals
 signal set_ball_active : std_logic;
 signal set_ball_position : position;
 signal catch_dead_ball : std_logic;
+-- collision stuff
 signal ball_position : position;
 signal ball_radius : radius;
 signal collision_summary_vector : std_logic_vector(5 downto 0);
 signal collision_vector : std_logic_vector(1 downto 0);
+-- graphic stuff
 signal rgba_summary_vector : std_logic_vector(11 downto 0);
 signal rgba : std_logic_vector(3 downto 0);
 signal vga_pixel : position;
+-- ps2 stuff
 signal ps2_data : std_logic_vector(7 downto 0);
 signal ps2_strobe : std_logic;
+-- clock stuff
+signal game_clk : std_logic;
+signal clk_25mhz : std_logic;
 
 
 begin
@@ -110,6 +121,11 @@ begin
 			     snd_data   => open,
 			     rcv_strobe => ps2_strobe,
 			     rcv_data   => ps2_data);
+	clock_generator_inst : clock_generator
+		port map(clk       => clk,
+			     rst       => rst,
+			     game_clk  => game_clk,
+			     clk_25mhz => clk_25mhz);
 	ball_inst : ball
 		port map(clk               => clk,
 			     rst               => rst,
