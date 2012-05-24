@@ -15,15 +15,14 @@ entity brick is
 		-- collision detection
 		ball_position : in positionT;
 		ball_radius : in radiusT;
-		paddle_collision_vector : out collision_vectorT
+		brick_collision_vector : out collision_vectorT
 	);
 end entity brick;
 
 
 architecture RTL of brick is
 	component collision_box
-		port(clk              : in  std_logic;
-			 rst              : in  std_logic;
+		port(
 			 position         : in  positionT;
 			 size             : in  sizeT;
 			 ball_position    : in  positionT;
@@ -31,16 +30,20 @@ architecture RTL of brick is
 			 collision_vector : out collision_vectorT);
 	end component collision_box;
 	
-	signal brick_size : sizeT; -- := (x=>TO_UNSIGNED(35, size.x'length), y=>TO_UNSIGNED(1, size.y'length));
+	signal brick_size : sizeT; -- := (x=>TO_UNSIGNED(35, sizeT.x'length), y=>TO_UNSIGNED(1, sizeT.y'length));
+	signal dead : std_logic := '0';
+	signal brick_collision_vector_tmp :collision_vectorT;
 begin
 	collision_box_inst : collision_box
-		port map(clk              => clk,
-			     rst              => rst,
+		port map(
 			     position         => brick_position,
 			     size             => brick_size,
 			     ball_position    => ball_position,
 			     ball_radius      => ball_radius,
-			     collision_vector => paddle_collision_vector);
-	rgb <= "100";
+			     collision_vector => brick_collision_vector_tmp);
+
+dead <= '0' when brick_collision_vector_tmp = "00" else '1';
+rgb <= "001" when (dead = '0') and (rgb_for_position.x > brick_position.x) and (rgb_for_position.x < (brick_position.x + brick_size.x)) and (rgb_for_position.y > brick_position.y) and (rgb_for_position.y < (brick_position.y + brick_size.y)) else "000";
+brick_collision_vector <= brick_collision_vector_tmp;
 
 end architecture RTL;

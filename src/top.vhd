@@ -40,7 +40,7 @@ component brick
 		 rgba                    : out rgbT;
 		 ball_position           : in  positionT;
 		 ball_radius             : in  radiusT;
-		 paddle_collision_vector : out collision_vectorT);
+		 brick_collision_vector : out collision_vectorT);
 end component brick;
 component paddle
 	port(clk                     : in  std_logic;
@@ -178,7 +178,7 @@ begin
 			     rgba                    => rgba_summary_vector(11 downto 8),
 			     ball_position           => ball_position,
 			     ball_radius             => ball_radius,
-			     paddle_collision_vector => collision_summary_vector(3 downto 2));
+			     brick_collision_vector => collision_summary_vector(3 downto 2));
 	screen_inst : screen
 		port map(ball_position    => ball_position,
 			     ball_radius      => ball_radius,
