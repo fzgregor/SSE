@@ -10,8 +10,8 @@ entity brick is
 		game_clk : in std_logic; -- next game action
 		brick_position : in positionT;
 		-- visible representation
-		rgba_for_position : in positionT;
-		rgba : out rgbaT;
+		rgb_for_position : in positionT;
+		rgb : out rgbT;
 		-- collision detection
 		ball_position : in positionT;
 		ball_radius : in radiusT;
@@ -41,6 +41,6 @@ begin
 			     ball_position    => ball_position,
 			     ball_radius      => ball_radius,
 			     collision_vector => paddle_collision_vector);
-	rgba <= x"4";
+	rgb <= "100";
 
 end architecture RTL;

@@ -14,8 +14,8 @@ entity paddle is
 		set_ball_strobe : out std_logic; -- indicate that set_ball is correct address
 		set_ball_position : out positionT;
 		-- visible representation
-		rgba_for_position : in positionT;
-		rgba : out rgbaT;
+		rgb_for_position : in positionT;
+		rgb : out rgbT;
 		-- collision detection
 		ball_position : in positionT;
 		ball_radius : in radiusT;
@@ -48,5 +48,5 @@ begin
 			     ball_radius      => ball_radius,
 			     collision_vector => paddle_collision_vector);
 
-    rgba <= x"2";
+    rgb <= "010";
 end architecture RTL;

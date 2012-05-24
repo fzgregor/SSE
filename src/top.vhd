@@ -23,7 +23,7 @@ component ball
 		 rst               : in  std_logic;
 		 game_clk          : in  std_logic;
 		 rgba_for_position : in  positionT;
-		 rgba              : out rgbaT;
+		 rgba              : out rgbT;
 		 set_ball_active   : in  std_logic;
 		 set_ball_position : in  positionT;
 		 dead              : out std_logic;
@@ -37,7 +37,7 @@ component brick
 		 game_clk                : in  std_logic;
 		 brick_position          : in  positionT;
 		 rgba_for_position       : in  positionT;
-		 rgba                    : out rgbaT;
+		 rgba                    : out rgbT;
 		 ball_position           : in  positionT;
 		 ball_radius             : in  radiusT;
 		 paddle_collision_vector : out collision_vectorT);
@@ -52,7 +52,7 @@ component paddle
 		 set_ball_strobe         : out std_logic;
 		 set_ball_position       : out positionT;
 		 rgba_for_position       : in  positionT;
-		 rgba                    : out rgbaT;
+		 rgba                    : out rgbT;
 		 ball_position           : in  positionT;
 		 ball_radius             : in  radiusT;
 		 paddle_collision_vector : out collision_vectorT);
@@ -91,7 +91,7 @@ component vga
 	port(clk25             : in  std_logic;
 		 reset             : in  std_logic;
 		 rgba_for_position : out positionT;
-		 rgba              : in  rgbaT;
+		 rgba              : in  rgbT;
 		 rgb               : out std_logic_vector(2 downto 0);
 		 vga_hs            : out std_logic;
 		 vga_vs            : out std_logic);
