@@ -26,8 +26,7 @@ end entity paddle;
 
 architecture RTL of paddle is
 	component collision_box
-		port(clk              : in  std_logic;
-			 rst              : in  std_logic;
+		port(
 			 position         : in  positionT;
 			 size             : in  sizeT;
 			 ball_position    : in  positionT;
@@ -40,8 +39,7 @@ architecture RTL of paddle is
 	signal paddle_size : sizeT; -- := (x=>TO_UNSIGNED(10, sizeT.x'length), y=>TO_UNSIGNED(1, sizeT.y'length));
 begin
 	collision_box_inst : collision_box
-		port map(clk              => clk,
-			     rst              => rst,
+		port map(
 			     position         => current_position,
 			     size             => paddle_size,
 			     ball_position    => ball_position,
