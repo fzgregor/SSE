@@ -11,7 +11,7 @@ entity brickout_game is
 		ps2_data_raw : inout std_logic;
 		ps2_clk : inout std_logic;
 		-- vga stuff
-		rgb : out std_logic_vector(2 downto 0);
+		rgb_to_screen : out rgbT;
 		h_sync : out std_logic;
 		v_sync : out std_logic
 	);
@@ -64,12 +64,12 @@ component screen
 end component screen;
 component combiner
 	generic(set_number  : natural;
-		    set_length  : natural;
-		    alpha_index : integer);
-	port(clk    : in  std_logic;
-		 rst    : in  std_logic;
-		 input  : in  std_logic_vector(set_number * set_length - 1 downto 0);
-		 output : out std_logic_vector(set_length - 1 downto 0));
+		    set_length  : natural);
+	port(clk     : in  std_logic;
+		 rst      : in  std_logic;
+		 game_clk : in std_logic;
+		 input    : in  std_logic_vector(set_number * set_length - 1 downto 0);
+		 output   : out std_logic_vector(set_length - 1 downto 0));
 end component combiner;
 component ps2_uart
 	port(rst, clk   : in    std_logic;
@@ -109,7 +109,7 @@ signal collision_summary_vector : std_logic_vector(5 downto 0);
 signal collision_vector : std_logic_vector(1 downto 0);
 -- graphic stuff
 signal rgb_summary_vector : std_logic_vector(8 downto 0);
-signal rgb : rgbT;
+signal rgb_to_vga_component : rgbT;
 signal vga_pixel : positionT;
 -- ps2 stuff
 signal ps2_data : std_logic_vector(7 downto 0);
@@ -139,16 +139,16 @@ begin
 		port map(clk25             => clk_25mhz,
 			     reset             => rst,
 			     rgb_for_position  => vga_pixel,
-			     rgb               => rgb,
-			     rgb               => rgb,
+			     rgb_in            => rgb_to_vga_component,
+			     rgb_out           => rgb_to_screen,
 			     vga_hs            => h_sync,
 			     vga_vs            => v_sync);
 	ball_inst : ball
 		port map(clk               => clk,
 			     rst               => rst,
 			     game_clk          => game_clk,
-			     rgba_for_position => vga_pixel,
-			     rgba              => rgb_summary_vector(2 downto 0),
+			     rgb_for_position  => vga_pixel,
+			     rgb               => rgb_summary_vector(2 downto 0),
 			     set_ball_active   => set_ball_active,
 			     set_ball_position => set_ball_position,
 			     dead              => catch_dead_ball,
@@ -185,18 +185,18 @@ begin
 			     collision_vector => collision_summary_vector(5 downto 4));
 	rgba_combiner_inst : combiner
 		generic map(set_number  => 3,
-			        set_length  => 4,
-			        alpha_index => 3)
+			        set_length  => 3)
 		port map(clk    => clk,
 			     rst    => rst,
-			     input  => rgba_summary_vector,
-			     output => rgba);
+				  game_clk => game_clk,
+			     input  => rgb_summary_vector,
+			     output => rgb_to_vga_component);
 	collision_combiner_inst : combiner
 		generic map(set_number  => 3,
-			        set_length  => 2,
-			        alpha_index => -1)
+			        set_length  => 2)
 		port map(clk    => clk,
 			     rst    => rst,
+				  game_clk => game_clk,
 			     input  => collision_summary_vector,
 			     output => collision_vector);
 	

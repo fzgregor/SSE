@@ -24,7 +24,7 @@ begin
 aktive_x <= '1' when (ball_position.x >= position.x) and  ((position.x + size.x) >= ball_position.x) else '0';
 aktive_y <= '1' when (ball_position.y >= position.y) and  ((position.y + size.y) >= ball_position.y) else '0';
 
-process (ball_position,ball_radius)
+process (ball_position,ball_radius,aktive_x,aktive_y,size,position)
 begin
 
 collision_vector <= "00";
