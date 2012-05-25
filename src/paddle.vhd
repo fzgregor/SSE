@@ -36,7 +36,7 @@ architecture RTL of paddle is
 	
 	type paddleState is (ball_catched, normal);
 	signal current_position : positionT; -- left upper corner of paddle
-	signal paddle_size : sizeT; -- := (x=>TO_UNSIGNED(10, sizeT.x'length), y=>TO_UNSIGNED(1, sizeT.y'length));
+	signal paddle_size : sizeT := (x=>to_unsigned(10, x_pos'length), y=>to_unsigned(1, y_pos'length));
 begin
 	collision_box_inst : collision_box
 		port map(

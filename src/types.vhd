@@ -3,10 +3,14 @@ use ieee.NUMERIC_STD.all;
 use ieee.std_logic_1164.all;
 
 package types is
+   subtype x_pos is unsigned (9 downto 0);
+	subtype y_pos is unsigned (8 downto 0);
+	subtype x_size is x_pos;
+	subtype y_size is y_pos;
 	type positionT is
 		record
-			x : unsigned (9 downto 0);
-			y : unsigned (8 downto 0);
+			x : x_pos;
+			y : y_pos;
 		end record;
 	subtype sizeT is positionT;
 	subtype collision_vectorT is std_logic_vector(1 downto 0); -- bit 1 horizontal, bit 0 vertical collision

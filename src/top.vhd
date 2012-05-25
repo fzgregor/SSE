@@ -22,8 +22,8 @@ component ball
 	port(clk               : in  std_logic;
 		 rst               : in  std_logic;
 		 game_clk          : in  std_logic;
-		 rgba_for_position : in  positionT;
-		 rgba              : out rgbT;
+		 rgb_for_position  : in  positionT;
+		 rgb               : out rgbT;
 		 set_ball_active   : in  std_logic;
 		 set_ball_position : in  positionT;
 		 dead              : out std_logic;
@@ -36,8 +36,8 @@ component brick
 		 rst                     : in  std_logic;
 		 game_clk                : in  std_logic;
 		 brick_position          : in  positionT;
-		 rgba_for_position       : in  positionT;
-		 rgba                    : out rgbT;
+		 rgb_for_position        : in  positionT;
+		 rgb                     : out rgbT;
 		 ball_position           : in  positionT;
 		 ball_radius             : in  radiusT;
 		 brick_collision_vector : out collision_vectorT);
@@ -51,8 +51,8 @@ component paddle
 		 ps2_strobe              : in  std_logic;
 		 set_ball_strobe         : out std_logic;
 		 set_ball_position       : out positionT;
-		 rgba_for_position       : in  positionT;
-		 rgba                    : out rgbT;
+		 rgb_for_position        : in  positionT;
+		 rgb                     : out rgbT;
 		 ball_position           : in  positionT;
 		 ball_radius             : in  radiusT;
 		 paddle_collision_vector : out collision_vectorT);
@@ -90,9 +90,9 @@ end component clock_generator;
 component vga
 	port(clk25             : in  std_logic;
 		 reset             : in  std_logic;
-		 rgba_for_position : out positionT;
-		 rgba              : in  rgbT;
-		 rgb               : out std_logic_vector(2 downto 0);
+		 rgb_for_position  : out positionT;
+		 rgb_in            : in  rgbT;
+		 rgb_out           : out rgbT;
 		 vga_hs            : out std_logic;
 		 vga_vs            : out std_logic);
 end component vga;
@@ -108,8 +108,8 @@ signal ball_radius : radiusT;
 signal collision_summary_vector : std_logic_vector(5 downto 0);
 signal collision_vector : std_logic_vector(1 downto 0);
 -- graphic stuff
-signal rgba_summary_vector : std_logic_vector(11 downto 0);
-signal rgba : std_logic_vector(3 downto 0);
+signal rgb_summary_vector : std_logic_vector(8 downto 0);
+signal rgb : rgbT;
 signal vga_pixel : positionT;
 -- ps2 stuff
 signal ps2_data : std_logic_vector(7 downto 0);
@@ -138,8 +138,8 @@ begin
 	vga_inst : vga
 		port map(clk25             => clk_25mhz,
 			     reset             => rst,
-			     rgba_for_position => vga_pixel,
-			     rgba              => rgba,
+			     rgb_for_position  => vga_pixel,
+			     rgb               => rgb,
 			     rgb               => rgb,
 			     vga_hs            => h_sync,
 			     vga_vs            => v_sync);
@@ -148,7 +148,7 @@ begin
 			     rst               => rst,
 			     game_clk          => game_clk,
 			     rgba_for_position => vga_pixel,
-			     rgba              => rgba_summary_vector(3 downto 0),
+			     rgba              => rgb_summary_vector(2 downto 0),
 			     set_ball_active   => set_ball_active,
 			     set_ball_position => set_ball_position,
 			     dead              => catch_dead_ball,
@@ -164,21 +164,21 @@ begin
 			     ps2_strobe              => ps2_strobe,
 			     set_ball_strobe         => set_ball_active,
 			     set_ball_position       => set_ball_position,
-			     rgba_for_position       => vga_pixel,
-			     rgba                    => rgba_summary_vector(7 downto 4),
+			     rgb_for_position        => vga_pixel,
+			     rgb                     => rgb_summary_vector(5 downto 3),
 			     ball_position           => ball_position,
 			     ball_radius             => ball_radius,
 			     paddle_collision_vector => collision_summary_vector(1 downto 0));
 	brick_inst : brick
-		port map(clk                     => clk,
+		port map(clk                    => clk,
 			     rst                     => rst,
 			     game_clk                => game_clk,
 			     brick_position          => (x=>TO_UNSIGNED(400, 10), y=>TO_UNSIGNED(300, 9)), --(x=>TO_UNSIGNED(400, positionT.x'length), y=>TO_UNSIGNED(300, positionT.y'length)),
-			     rgba_for_position       => vga_pixel,
-			     rgba                    => rgba_summary_vector(11 downto 8),
+			     rgb_for_position        => vga_pixel,
+			     rgb                     => rgb_summary_vector(8 downto 6),
 			     ball_position           => ball_position,
 			     ball_radius             => ball_radius,
-			     brick_collision_vector => collision_summary_vector(3 downto 2));
+			     brick_collision_vector  => collision_summary_vector(3 downto 2));
 	screen_inst : screen
 		port map(ball_position    => ball_position,
 			     ball_radius      => ball_radius,
