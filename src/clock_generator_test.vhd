@@ -73,9 +73,9 @@ BEGIN
    -- Clock process definitions
    clk_process :process
    begin
-		clk <= '0';
-		wait for clk_period/2;
 		clk <= '1';
+		wait for clk_period/2;
+		clk <= '0';
 		wait for clk_period/2;
    end process;
  
@@ -83,27 +83,6 @@ BEGIN
    -- Stimulus process
    stim_proc: process
    begin
-	   wait for clk_period;
-      assert clk_25mhz = '1' and game_clk = '1'
-		severity failure;
-		wait for clk_period;
-      assert clk_25mhz = '1' and game_clk = '0'
-		severity failure;
-      assert clk_25mhz = '0' and game_clk = '0'
-		severity failure;
-      assert clk_25mhz = '0' and game_clk = '0'
-		severity failure;
-      assert clk_25mhz = '1' and game_clk = '0'
-		severity failure;
-		--wait for clk_period *4096 - 4 - 1;
-		wait for clk_period*4091;
-      assert game_clk = '0'
-		severity failure;
-      assert game_clk = '1'
-		severity failure;
-      assert game_clk = '0'
-		severity failure;
-
       wait;
    end process;
 
