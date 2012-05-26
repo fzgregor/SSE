@@ -30,7 +30,7 @@ architecture RTL of brick is
 			 collision_vector : out collision_vectorT);
 	end component collision_box;
 	
-	signal brick_size : sizeT; -- := (x=>TO_UNSIGNED(35, sizeT.x'length), y=>TO_UNSIGNED(1, sizeT.y'length));
+	signal brick_size : sizeT := (x=>TO_UNSIGNED(35, 10), y=>TO_UNSIGNED(5, 9));
 	signal dead : std_logic := '0';
 	signal brick_collision_vector_tmp :collision_vectorT;
 begin
