@@ -19,7 +19,7 @@ entity brick is
 	);
 end entity brick;
 
-
+ 
 architecture RTL of brick is
 	component collision_box
 		port(

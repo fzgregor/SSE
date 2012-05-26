@@ -16,7 +16,7 @@ architecture RTL of clock_generator is
 signal cnt : unsigned(10 downto 0);
 signal cnt_old : unsigned (10 downto 0);
 
-
+ 
 begin
 	
 process (clk)
