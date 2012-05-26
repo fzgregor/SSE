@@ -74,13 +74,128 @@ BEGIN
    -- Stimulus process
    stim_proc: process
    begin
-      wait for 10 ns;	
+	   --- none collision tests
+	   --- somewhere on the screen
+      wait for 10 ps;	
 		ball_position <= (x=>to_unsigned(100, positionT.x'length), y=>to_unsigned(200, positionT.y'length));
 		ball_radius <= to_unsigned(16, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "00"
+		severity failure;
+		
+		--- upper boundary
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(100, positionT.x'length), y=>to_unsigned(1, positionT.y'length));
+		ball_radius <= to_unsigned(0, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "00"
+		severity failure;
+		
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(100, positionT.x'length), y=>to_unsigned(2, positionT.y'length));
+		ball_radius <= to_unsigned(1, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "00"
+		severity failure;
+		
+		--- lower boundary
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(100, positionT.x'length), y=>to_unsigned(479, positionT.y'length));
+		ball_radius <= to_unsigned(0, radiusT'length);
 		
 		assert collision_vector = "00"
 		severity failure;
-      wait for 10 ns;	
+		
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(100, positionT.x'length), y=>to_unsigned(478, positionT.y'length));
+		ball_radius <= to_unsigned(1, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "00"
+		severity failure;
+		
+		--- left boundary
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(1, positionT.x'length), y=>to_unsigned(100, positionT.y'length));
+		ball_radius <= to_unsigned(0, radiusT'length);
+		
+		assert collision_vector = "00"
+		severity failure;
+		
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(2, positionT.x'length), y=>to_unsigned(100, positionT.y'length));
+		ball_radius <= to_unsigned(1, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "00"
+		severity failure;
+		
+		--- right boundary
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(638, positionT.x'length), y=>to_unsigned(100, positionT.y'length));
+		ball_radius <= to_unsigned(0, radiusT'length);
+		
+		assert collision_vector = "00"
+		severity failure;
+		wait for 1 ps;
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(637, positionT.x'length), y=>to_unsigned(100, positionT.y'length));
+		ball_radius <= to_unsigned(1, radiusT'length);
+		
+		assert collision_vector = "00"
+		severity failure;
+		
+		--- collision tests
+		--- upper boundary
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(100, positionT.x'length), y=>to_unsigned(0, positionT.y'length));
+		ball_radius <= to_unsigned(0, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "10"
+		severity failure;
+		
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(100, positionT.x'length), y=>to_unsigned(1, positionT.y'length));
+		ball_radius <= to_unsigned(1, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "10"
+		severity failure;
+		
+		--- left boundary
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(0, positionT.x'length), y=>to_unsigned(100, positionT.y'length));
+		ball_radius <= to_unsigned(0, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "01"
+		severity failure;
+		
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(1, positionT.x'length), y=>to_unsigned(100, positionT.y'length));
+		ball_radius <= to_unsigned(1, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "01"
+		severity failure;
+		
+		--- right boundary
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(639, positionT.x'length), y=>to_unsigned(100, positionT.y'length));
+		ball_radius <= to_unsigned(0, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "01"
+		severity failure;
+		
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(638, positionT.x'length), y=>to_unsigned(100, positionT.y'length));
+		ball_radius <= to_unsigned(1, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "01"
+		severity failure;
+		
+		-- left upper boundary
+      wait for 10 ps;	
+		ball_position <= (x=>to_unsigned(1, positionT.x'length), y=>to_unsigned(1, positionT.y'length));
+		ball_radius <= to_unsigned(1, radiusT'length);
+		wait for 1 ps;
+		assert collision_vector = "11"
+		severity failure;
 
 
       wait;

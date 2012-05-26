@@ -18,7 +18,9 @@ begin
 process (ball_position,ball_radius)
 begin
 
- if (ball_position.x - ball_radius = 0) or (ball_position.x + ball_radius = 640) then 
+ if ((ball_position.x - ball_radius = 0) or (ball_position.x + ball_radius = 639)) and (ball_position.y - ball_radius = 0) then 
+	collision_vector <= "11"; 
+ elsif (ball_position.x - ball_radius = 0) or (ball_position.x + ball_radius = 639) then 
 	collision_vector <= "01";
  elsif (ball_position.y - ball_radius = 0) then
 	collision_vector <= "10";
