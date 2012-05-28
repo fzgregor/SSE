@@ -22,7 +22,7 @@ entity paddle is
 		paddle_collision_vector : out collision_vectorT
 	);
 end entity paddle;
-
+ 
 
 architecture RTL of paddle is
 

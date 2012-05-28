@@ -22,23 +22,8 @@ entity ball is
 end entity ball;
 
 architecture RTL of ball is
-    signal current_position : positionT;
-    signal current_positionNext : positionT;
-	 -- state stuff
-    type ballStateT is (death, moving, catched);
-	 signal State : ballStateT := death;
-	 signal NextState : ballStateT := death;
-	 -- movement stuff
-	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
-	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
-	 signal horizontal_velocity : unsigned(3 downto 0) := "1111";
-	 signal vertical_velocity : unsigned(3 downto 0) := "1100";
-	 signal horizontal_move : std_logic := '0';
-	 signal vertical_move : std_logic := '0';
-	 signal horizontal_negative : std_logic := '0';
-	 signal vertical_negative : std_logic := '0';
-	 signal horizontal_negativeNext : std_logic := '0';
-	 signal vertical_negativeNext : std_logic := '1';
+	
+   signal current_position : positionT;
 	
 begin
     -- static things
@@ -137,6 +122,5 @@ begin
 					 end if;
 		  end case;
 	 end process;
-	 
 
 end architecture RTL;

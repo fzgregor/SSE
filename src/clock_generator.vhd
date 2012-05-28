@@ -13,10 +13,10 @@ end entity clock_generator;
 
 architecture RTL of clock_generator is
 	
-signal cnt : unsigned(10 downto 0) := (others => '0');
-signal cnt_old : unsigned (10 downto 0) := (others => '0');
+signal cnt : unsigned(9 downto 0):= (others => '0');
+signal cnt_old : unsigned (9 downto 0):= (others => '0');
 
-
+ 
 begin
 	
 process (clk)
@@ -27,11 +27,11 @@ begin
 		else 
 			cnt <= cnt+1;
 			cnt_old <= cnt;
-		end if;
+		end if; 
 	end if;
 end process;
 
-clk_25mhz <= cnt(1); -- 25 MHz for the vga componen									  ++			  	  ++
+clk_25mhz <= '1' when cnt(0)= '1' else '0'; -- 25 MHz for the vga componen									  ++			  	  ++
 game_clk <= cnt(cnt'left) and not cnt_old(cnt_old'left); -- 48 KHz clk edge as game clk -------------  -------------  --------------
 
 end architecture RTL;
