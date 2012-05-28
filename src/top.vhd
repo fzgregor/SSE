@@ -173,7 +173,7 @@ begin
 		port map(clk                    => clk,
 			     rst                     => rst,
 			     game_clk                => game_clk,
-			     brick_position          => (x=>TO_UNSIGNED(400, 10), y=>TO_UNSIGNED(300, 9)), --(x=>TO_UNSIGNED(400, positionT.x'length), y=>TO_UNSIGNED(300, positionT.y'length)),
+			     brick_position          => (x=>TO_UNSIGNED(400, x_pos'length), y=>TO_UNSIGNED(300, y_pos'length)),
 			     rgb_for_position        => vga_pixel,
 			     rgb                     => rgb_summary_vector(8 downto 6),
 			     ball_position           => ball_position,

@@ -124,6 +124,8 @@ begin
 					 end if;
 				when catched =>
 				    current_positionNext <= set_ball_position;
+                vertical_negativeNext <= '1';
+                horizontal_negativeNext <= '0';
 					 
 					 -- state transitions
 					 if set_ball_active = '0' then

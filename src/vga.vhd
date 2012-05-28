@@ -64,16 +64,16 @@ process (clk25)
 begin 
 	if rising_edge(clk25) then
 		if reset = '1' then
-		   cnt_h <= to_unsigned(0,cnt_h'length);
-			cnt_v <=to_unsigned(0,cnt_v'length); 
+		   cnt_h <= (others => '0');
+			cnt_v <= (others => '0');
 		end if;
 		cnt_h <= cnt_h+1;
 		if cnt_h = to_unsigned(800,cnt_h'length) then
 			cnt_v <= cnt_v+1;
-			cnt_h <= to_unsigned(0,cnt_h'length);
+			cnt_h <= (others => '0');
 		end if;
 		if cnt_v = to_unsigned(521,cnt_v'length) then 
-			cnt_v <= to_unsigned(0,cnt_v'length);
+			cnt_v <= (others => '0');
 		end if;
 	end if;
 end process;
