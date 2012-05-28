@@ -30,9 +30,12 @@ architecture RTL of brick is
 			 collision_vector : out collision_vectorT);
 	end component collision_box;
 	
-	signal brick_size : sizeT := (x=>TO_UNSIGNED(35, 10), y=>TO_UNSIGNED(5, 9));
-	signal dead : std_logic := '0';
+	signal brick_size : sizeT := (x=>TO_UNSIGNED(50, 10), y=>TO_UNSIGNED(10, 9));
 	signal brick_collision_vector_tmp :collision_vectorT;
+	type tState is (alive,dead);
+	signal State: tState := alive;
+	signal NextState : tState;
+	
 begin
 	collision_box_inst : collision_box
 		port map(
@@ -41,9 +44,38 @@ begin
 			     ball_position    => ball_position,
 			     ball_radius      => ball_radius,
 			     collision_vector => brick_collision_vector_tmp);
-
-dead <= '0' when brick_collision_vector_tmp = "00" else '1';
-rgb <= "001" when (dead = '0') and (rgb_for_position.x > brick_position.x) and (rgb_for_position.x < (brick_position.x + brick_size.x)) and (rgb_for_position.y > brick_position.y) and (rgb_for_position.y < (brick_position.y + brick_size.y)) else "000";
-brick_collision_vector <= brick_collision_vector_tmp;
+				  
+	process (clk)
+	begin
+		if rising_edge(clk) then 
+			if rst = '1' then 
+				State <= alive;
+			else 
+				State <= NextState;
+			end if;
+		end if;
+	
+	end process;
+	
+	process(brick_collision_vector_tmp,rgb_for_position, brick_position,brick_size)
+	begin 
+	NextState <= State;
+		case (State) is
+			when alive =>
+			  brick_collision_vector <= brick_collision_vector_tmp ;
+			  if brick_collision_vector_tmp /= "00" then 
+				 NextState <= dead;
+			  end if;
+			  if (rgb_for_position.x > brick_position.x) and (rgb_for_position.x < (brick_position.x + brick_size.x)) and (rgb_for_position.y > brick_position.y) and (rgb_for_position.y < (brick_position.y + brick_size.y)) then
+			    rgb <= "001";
+			  end if;
+			  
+			when dead =>
+				 brick_collision_vector <= "00";
+				 rgb <= "000";
+			when others => Null;
+		end case;
+	
+	end process;
 
 end architecture RTL;
