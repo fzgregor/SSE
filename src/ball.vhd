@@ -31,11 +31,11 @@ architecture RTL of ball is
 	 -- movement stuff
 	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
 	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
-	 signal horizontal_velocity : unsigned(3 downto 0) := "0011";
+	 signal horizontal_velocity : unsigned(3 downto 0) := "0001";
 	 signal vertical_velocity : unsigned(3 downto 0) := "0100";
 	 signal horizontal_move : std_logic := '0';
 	 signal vertical_move : std_logic := '0';
-	 signal horizontal_negative : std_logic := '1';
+	 signal horizontal_negative : std_logic := '0';
 	 signal vertical_negative : std_logic := '1';
 	 signal horizontal_negativeNext : std_logic;
 	 signal vertical_negativeNext : std_logic;
@@ -47,7 +47,7 @@ begin
     ball_radius <= (others => '0');
 	 ball_position <= current_position;
 	 -- graphics
-	 rgb <= "111" when rgb_for_position.x >= current_position.x and rgb_for_position.x <= current_position.x + 5 and rgb_for_position.y <= current_position.y and rgb_for_position.y >= current_position.y-5 and State /= death else "000";
+	 rgb <= "010" when rgb_for_position.x >= current_position.x and rgb_for_position.x <= current_position.x + 5 and rgb_for_position.y <= current_position.y and rgb_for_position.y >= current_position.y-5 and State /= death else "000";
 	 -- movement
 	 horizontal_move <= movement_cnt(15 - to_integer(horizontal_velocity)) and not movement_cnt_old(15 - to_integer(horizontal_velocity)) and game_clk;
 	 vertical_move <= movement_cnt(15 - to_integer(vertical_velocity)) and not movement_cnt_old(15 - to_integer(vertical_velocity)) and game_clk;
@@ -126,8 +126,8 @@ begin
 					 end if;
 				when catched =>
 				    current_positionNext <= set_ball_position;
---                vertical_negativeNext <= '1';
---                horizontal_negativeNext <= '0';
+                vertical_negativeNext <= '1';
+                horizontal_negativeNext <= '0';
 					 
 					 -- state transitions
 					 if set_ball_active = '0' then

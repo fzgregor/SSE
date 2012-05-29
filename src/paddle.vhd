@@ -80,7 +80,7 @@ stop <= '1' when ps2_data = x"F0" and ps2_strobe_edge = '1' else '0';
 action <= cnt(cnt'left) and not cnt_old(cnt_old'left);
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 current_position <= (x => paddle_begin , y=>TO_UNSIGNED(450,y_pos'length));
-set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (450 - ball_radius)); 
+set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(450, y_pos'length) - 1 - ball_radius)); 
 
 process (clk)
 begin

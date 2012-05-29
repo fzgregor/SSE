@@ -148,7 +148,7 @@ begin
 			     rst               => rst,
 			     game_clk          => game_clk,
 			     rgb_for_position  => vga_pixel,
-			     rgb               => rgb_to_vga_component,
+			     rgb               => rgb_summary_vector(2 downto 0),
 			     set_ball_active   => set_ball_active,
 			     set_ball_position => set_ball_position,
 			     dead              => catch_dead_ball,
@@ -183,14 +183,14 @@ begin
 		port map(ball_position    => ball_position,
 			     ball_radius      => ball_radius,
 			     collision_vector => collision_summary_vector(5 downto 4));
---	rgba_combiner_inst : combiner
---		generic map(set_number  => 3,
---			        set_length  => 3)
---		port map(clk    => clk,
---			     rst    => rst,
---				  game_clk => game_clk,
---			     input  => rgb_summary_vector,
---			     output => rgb_to_vga_component);
+	rgba_combiner_inst : combiner
+		generic map(set_number  => 3,
+			        set_length  => 3)
+		port map(clk    => clk,
+			     rst    => rst,
+				  game_clk => game_clk,
+			     input  => rgb_summary_vector,
+			     output => rgb_to_vga_component);
 	collision_combiner_inst : combiner
 		generic map(set_number  => 3,
 			        set_length  => 2)

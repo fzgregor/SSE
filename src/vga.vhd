@@ -68,7 +68,7 @@ begin
 			cnt_v <= (others => '0');
 		end if;
 		cnt_h <= cnt_h+1;
-		if cnt_h = to_unsigned(800,cnt_h'length) then
+		if cnt_h = to_unsigned(799,cnt_h'length) then
 			cnt_v <= cnt_v+1;
 			cnt_h <= (others => '0');
 		end if;
