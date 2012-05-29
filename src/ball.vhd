@@ -27,18 +27,19 @@ architecture RTL of ball is
 	 -- state stuff
     type ballStateT is (death, moving, catched);
 	 signal State : ballStateT := death;
-	 signal NextState : ballStateT := death;
+	 signal NextState : ballStateT;
 	 -- movement stuff
 	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
 	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
-	 signal horizontal_velocity : unsigned(3 downto 0) := "1111";
-	 signal vertical_velocity : unsigned(3 downto 0) := "1100";
+	 signal horizontal_velocity : unsigned(3 downto 0) := "0011";
+	 signal vertical_velocity : unsigned(3 downto 0) := "0100";
 	 signal horizontal_move : std_logic := '0';
 	 signal vertical_move : std_logic := '0';
-	 signal horizontal_negative : std_logic := '0';
-	 signal vertical_negative : std_logic := '0';
-	 signal horizontal_negativeNext : std_logic := '0';
-	 signal vertical_negativeNext : std_logic := '1';
+	 signal horizontal_negative : std_logic := '1';
+	 signal vertical_negative : std_logic := '1';
+	 signal horizontal_negativeNext : std_logic;
+	 signal vertical_negativeNext : std_logic;
+	 signal collision_vector_old : collision_vectorT;
 	
 begin
     -- static things
@@ -46,7 +47,7 @@ begin
     ball_radius <= (others => '0');
 	 ball_position <= current_position;
 	 -- graphics
-	 rgb <= "010" when rgb_for_position = current_position and State /= death else "000";
+	 rgb <= "111" when rgb_for_position.x >= current_position.x and rgb_for_position.x <= current_position.x + 5 and rgb_for_position.y <= current_position.y and rgb_for_position.y >= current_position.y-5 and State /= death else "000";
 	 -- movement
 	 horizontal_move <= movement_cnt(15 - to_integer(horizontal_velocity)) and not movement_cnt_old(15 - to_integer(horizontal_velocity)) and game_clk;
 	 vertical_move <= movement_cnt(15 - to_integer(vertical_velocity)) and not movement_cnt_old(15 - to_integer(vertical_velocity)) and game_clk;
@@ -75,11 +76,12 @@ begin
 				current_position <= current_positionNext;
             vertical_negative <= vertical_negativeNext;
             horizontal_negative <= horizontal_negativeNext;
+				collision_vector_old <= collision_vector;
 		  end if;
     end process;
 	 
 	 -- state machine
-	 process(State, collision_vector, set_ball_active, current_position, horizontal_move, vertical_move, vertical_negative, horizontal_negative)
+	 process(State, collision_vector, collision_vector_old, set_ball_active, current_position, horizontal_move, vertical_move, vertical_negative, horizontal_negative)
 	 begin
 	     -- standard output to prevent latches
 	     NextState <= State;
@@ -110,10 +112,10 @@ begin
 						  end if;
 					 end if;
 					 -- collision calculation
-					 if collision_vector(0) = '1' then
+					 if collision_vector(0) = '1' and collision_vector_old(0) = '0' then
 					     vertical_negativeNext <= not vertical_negative;
 					 end if;
-					 if collision_vector(1) = '1' then
+					 if collision_vector(1) = '1' and collision_vector_old(1) = '0' then
 					     horizontal_negativeNext <= not horizontal_negative;
 					 end if;
 					 -- state transitions
@@ -124,8 +126,8 @@ begin
 					 end if;
 				when catched =>
 				    current_positionNext <= set_ball_position;
-                vertical_negativeNext <= '1';
-                horizontal_negativeNext <= '0';
+--                vertical_negativeNext <= '1';
+--                horizontal_negativeNext <= '0';
 					 
 					 -- state transitions
 					 if set_ball_active = '0' then

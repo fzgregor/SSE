@@ -30,7 +30,7 @@ architecture RTL of brick is
 			 collision_vector : out collision_vectorT);
 	end component collision_box;
 	
-	signal brick_size : sizeT := (x=>TO_UNSIGNED(50, 10), y=>TO_UNSIGNED(10, 9));
+	signal brick_size : sizeT := (x=>TO_UNSIGNED(50, x_pos'length), y=>TO_UNSIGNED(10, y_pos'length));
 	signal brick_collision_vector_tmp :collision_vectorT;
 	type tState is (alive,dead);
 	signal State: tState := alive;
@@ -60,6 +60,7 @@ begin
 	process(brick_collision_vector_tmp,rgb_for_position, brick_position,brick_size)
 	begin 
 	NextState <= State;
+   rgb <= "000";
 		case (State) is
 			when alive =>
 			  brick_collision_vector <= brick_collision_vector_tmp ;
@@ -72,7 +73,6 @@ begin
 			  
 			when dead =>
 				 brick_collision_vector <= "00";
-				 rgb <= "000";
 			when others => Null;
 		end case;
 	

@@ -29,7 +29,7 @@ architecture RTL of paddle is
 
 signal paddle_begin : unsigned (9 downto 0) := to_unsigned (280,10) ;
 signal paddle_begin_Next : unsigned (9 downto 0) := to_unsigned (280,10) ;
-signal paddle_size : sizeT := (x=>TO_UNSIGNED(60,10), y=>TO_UNSIGNED(10,9));
+signal paddle_size : sizeT := (x=>TO_UNSIGNED(60,x_pos'length), y=>TO_UNSIGNED(10,y_pos'length));
 type tState is  (Start, Idle ,Ignore, Move_Right , Move_Left);
 signal State : tState := Idle;
 signal NextState : tState;
@@ -79,7 +79,7 @@ release_ball <= '1' when ps2_data = x"73" and ps2_strobe_edge = '1' else '0';
 stop <= '1' when ps2_data = x"F0" and ps2_strobe_edge = '1' else '0';
 action <= cnt(cnt'left) and not cnt_old(cnt_old'left);
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
-current_position <= (x => paddle_begin , y=>TO_UNSIGNED(450,9));
+current_position <= (x => paddle_begin , y=>TO_UNSIGNED(450,y_pos'length));
 set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (450 - ball_radius)); 
 
 process (clk)
@@ -111,7 +111,7 @@ begin
   case (State) is 
   
     when Start =>  
-	   paddle_begin_Next <= to_unsigned (280,10) ;
+	   paddle_begin_Next <= to_unsigned (280,paddle_begin_Next'length) ;
 		NextState <= Idle;
 		
     when Idle => 
@@ -174,7 +174,7 @@ end process;
 -- paddle Drawing
 process (rgb_for_position,paddle_begin,paddle_size)
 begin 
-  rgb <= "111";
+  rgb <= "000";
   if (rgb_for_position.x > paddle_begin) and (rgb_for_position.x < (paddle_begin + paddle_size.x )) and (rgb_for_position.y > 450) and (rgb_for_position.y < 460)then 
     rgb <= "100";
   end if;

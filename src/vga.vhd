@@ -46,7 +46,7 @@ end vga;
 architecture Behavioral of vga is
 
 signal cnt_h : unsigned (9 downto 0) := "0000000000";
-signal cnt_v : unsigned (8 downto 0) := "000000000";
+signal cnt_v : unsigned (9 downto 0) := "0000000000";
 signal visible : STD_LOGIC := '0';
 
 begin
