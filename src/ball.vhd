@@ -22,7 +22,7 @@ entity ball is
 end entity ball;
 
 architecture RTL of ball is
-    signal current_position : positionT;
+    signal current_position : positionT := (x=>to_unsigned(10, x_pos'length), y=>to_unsigned(10, y_pos'length));
     signal current_positionNext : positionT;
 	 -- state stuff
     type ballStateT is (death, moving, catched);
@@ -31,8 +31,8 @@ architecture RTL of ball is
 	 -- movement stuff
 	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
 	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
-	 signal horizontal_velocity : unsigned(3 downto 0) := "0001";
-	 signal vertical_velocity : unsigned(3 downto 0) := "0100";
+	 signal horizontal_velocity : unsigned(3 downto 0) := "1000";
+	 signal vertical_velocity : unsigned(3 downto 0) := "1000";
 	 signal horizontal_move : std_logic := '0';
 	 signal vertical_move : std_logic := '0';
 	 signal horizontal_negative : std_logic := '0';
@@ -112,10 +112,10 @@ begin
 						  end if;
 					 end if;
 					 -- collision calculation
-					 if collision_vector(0) = '1' and collision_vector_old(0) = '0' then
+					 if collision_vector(1) = '1' and collision_vector_old(1) = '0' then
 					     vertical_negativeNext <= not vertical_negative;
 					 end if;
-					 if collision_vector(1) = '1' and collision_vector_old(1) = '0' then
+					 if collision_vector(0) = '1' and collision_vector_old(0) = '0' then
 					     horizontal_negativeNext <= not horizontal_negative;
 					 end if;
 					 -- state transitions
