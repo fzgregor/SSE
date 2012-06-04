@@ -1,0 +1,61 @@
+Version 0.1
+===========
+
+Beim Testen hat sich herrausgestellt, dass unser Design wegen der großen Parallelität viele Ressourcen benötigt. Vorallem in Bezug auf die Bricks. 44 Bricks ist das aktuelle Maximum. 45 passen nicht mehr auf den Chip.
+Dabei soll noch soetwas wie Multiballbetrieb kommen was weitere Ressourcen benötigen wird.
+
+
+Version 0.2
+===========
+
+AP 1: Signal-Cutter
+-------------------
+Zweck: Ressourcenreduktion
+Aufwandschätzung: 4h
+Beschreibung: Das Positionssignal (rgb_for_position & ball_position) wird durch die Signal-Cutter Komponente um nicht relevante Stellen gekürzt. Das spart Ressourcen weil die Vergleicher weniger komplex sein müssen.
+Eingesetzt werden soll diese neue Komponente in der Brick-Row und der neuen Brick-Space Komponente. Diese beiden Komponenten wissen bereits das ihre enthaltenen Bricks nur in einem bestimmten Bereich liegen können. Daher können sie gekürzte, zu ihrer Anfangsposition relative Positionssignale weitergeben und die Rückantworten wieder auf komplette Positionssignale erweitern.
+
+AP 1.1: Collision-Box generisch
+-------------------------------
+
+Beschreibung: Um in Komponenten die gekürzte Positionssignale erhalten weiterhin die Collision-Box Komponente verwenden zu können muss diese über Generics an die breite der gekürzten Signale angepasst werden können.
+
+AP 2: Verringerung der Positionsauflösung
+-----------------------------------------
+Zweck: Ressourcenreduktion
+Aufwandsschätzung: 2h
+Beschreibung: Durch die Verringerung der Positionsauflösung auf 320x240 werden Ressourcen in den Vergleichern eingespart. Da wir sowieso ein eher blöckiges Aussehen haben sollte sich die Verringerung nicht sonderlich negativ auswirken.
+
+AP 3: Brick-Space Komponente
+----------------------------
+Zweck: Kapselung
+Aufwandsschätzung: 1h
+Beschreibung: Die Brick-Space Komponente enthält 4 Brick-Row Komponenten und dient hauptsächlich der Kapselung(Komplexitätsverringerung). Ausserdem können durch sie die Brick-Komponenten ressourcensparender realisiert werden (siehe AP 1).
+
+AP 4: Paddle variert Ballbewegung
+---------------------------------
+Zweck: Gameplay
+Aufwandsschätzung: 3h
+Beschreibung: In Abhängigkeit des Berührungspunktes und der aktuellen Paddlegeschwindigkeit wird die Ballbewegung(Richtung sowie Geschwindigkeit) beeinflusst.
+
+AP 5: Ballstatus in Ball-Komponente
+-----------------------------------
+Zweck: Erweiterbarkeit
+Aufwandsschätzung: 1h
+Beschreibung: Behandlung des Ballstatus Catched in der Ball-Komponente um später mehrere Bälle unterstüzen zu können.
+
+AP 6: Spiellogik
+----------------
+Zweck: Gameplay
+Aufwandsschätzung: 2h
+Beschreibung: Implementation der Spielelogik (Leben, Level, Start u. Stopbildschirm anzeigen).
+
+AP 7: Ressourcenoptimierungen
+-----------------------------
+Zweck: Ressourcenreduktion
+Aufwandsschätzung: 2h
+Beschreibung: Kleiner Ressourcenoptimierungen (Vergleicher, States weg, was auch immer)
+
+AP 8: Bugfixing
+---------------
+
