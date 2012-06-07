@@ -1,0 +1,14 @@
+NET "clk"         LOC =  "T9";
+NET "h_sync"         LOC =  "R9";
+NET "v_sync"         LOC =  "T10";
+NET "rgb_to_screen<2>"          LOC =  "R11";
+NET "rgb_to_screen<1>"          LOC =  "T12";
+NET "rgb_to_screen<0>"          LOC =  "R12";
+NET "rst"       LOC =  "L14";
+
+NET "ps2_clk"  LOC = "M16" ;
+NET "ps2_data_raw"  LOC = "M15";
+
+#Created by Constraints Editor (xc3s200-ft256-4) - 2012/05/31
+NET "clk" TNM_NET = clk;
+TIMESPEC TS_clk = PERIOD "clk" 50 MHz HIGH 50%;
