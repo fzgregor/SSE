@@ -31,17 +31,16 @@ component ball
 		 ball_radius	   : out radiusT;
 		 collision_vector  : in  collision_vectorT);
 end component ball;
-component brick_row
+component brick_space
 	port(clk                     : in  std_logic;
 		 rst                     : in  std_logic;
 		 game_clk                : in  std_logic;
-		 row_position            : in  positionT;
 		 rgb_for_position        : in  positionT;
 		 rgb                     : out rgbT;
 		 ball_position           : in  positionT;
 		 ball_radius             : in  radiusT;
 		 collision_vector        : out collision_vectorT);
-end component brick_row;
+end component brick_space;
 component paddle
 	port(clk                     : in  std_logic;
 		 rst                     : in  std_logic;
@@ -169,11 +168,10 @@ begin
 			     ball_position           => ball_position,
 			     ball_radius             => ball_radius,
 			     paddle_collision_vector => collision_summary_vector(1 downto 0));
-	brick_row_inst : brick_row
+	brick_space_inst : brick_space
 		port map(clk                    => clk,
 			     rst                     => rst,
 			     game_clk                => game_clk,
-			     row_position            => (x=>TO_UNSIGNED(20, x_pos'length), y=>TO_UNSIGNED(40, y_pos'length)),
 			     rgb_for_position        => vga_pixel,
 			     rgb                     => rgb_summary_vector(8 downto 6),
 			     ball_position           => ball_position,

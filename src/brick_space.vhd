@@ -31,12 +31,11 @@ use work.types.all;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity brick_row is
+entity brick_space is
 	port (
 		clk : in std_logic;
 		rst : in std_logic;
 		game_clk : in std_logic; -- next game action
-		row_position : in positionT;
 		-- visible representation
 		rgb_for_position : in positionT;
 		rgb : out rgbT;
@@ -45,22 +44,24 @@ entity brick_row is
 		ball_radius : in radiusT;
 		collision_vector : out collision_vectorT
 	);
-end entity brick_row;
+end entity brick_space;
 
-architecture Behavioral of brick_row is
-   constant BRICK_NUMBER : integer := 10;
+architecture Behavioral of brick_space is
+   constant ROW_NUMBER : integer := 4;
+	constant SPACE_POSITION_X : integer := 20;
+	constant SPACE_POSITION_Y : integer := 40;
 	
-   component brick
+   component brick_row
 	   port(clk                     : in  std_logic;
 		    rst                     : in  std_logic;
 		    game_clk                : in  std_logic;
-		    brick_position          : in  positionT;
+		    row_position          : in  positionT;
 		    rgb_for_position        : in  positionT;
 		    rgb                     : out rgbT;
 		    ball_position           : in  positionT;
 		    ball_radius             : in  radiusT;
-		    brick_collision_vector : out collision_vectorT);
-   end component brick;
+		    collision_vector : out collision_vectorT);
+   end component brick_row;
    component combiner
 	   generic(set_number  : natural;
 		       set_length  : natural);
@@ -70,29 +71,29 @@ architecture Behavioral of brick_row is
 		    input    : in  std_logic_vector(set_number * set_length - 1 downto 0);
 		    output   : out std_logic_vector(set_length - 1 downto 0));
    end component combiner;
-	signal rgb_summary_vector : std_logic_vector(3*BRICK_NUMBER-1 downto 0);
-	signal collision_summary_vector : std_logic_vector(2*BRICK_NUMBER-1 downto 0);
+	signal rgb_summary_vector : std_logic_vector(3*ROW_NUMBER-1 downto 0);
+	signal collision_summary_vector : std_logic_vector(2*ROW_NUMBER-1 downto 0);
 	
 	type position_vectorT is array (natural range<>) of positionT;
-	signal position_i : position_vectorT(0 to BRICK_NUMBER-1);
+	signal position_i : position_vectorT(0 to ROW_NUMBER-1);
 
 begin
 	rgb_combiner : combiner
-	   generic map(set_number=>BRICK_NUMBER, set_length=>3)
+	   generic map(set_number=>ROW_NUMBER, set_length=>3)
 	   port map(clk=>clk, rst=>rst, game_clk=>game_clk,
                input=>rgb_summary_vector, output=>rgb);
 	collision_combiner : combiner
-	   generic map(set_number=>BRICK_NUMBER, set_length=>2)
+	   generic map(set_number=>ROW_NUMBER, set_length=>2)
 	   port map(clk=>clk, rst=>rst, game_clk=>game_clk,
                input=>collision_summary_vector, output=>collision_vector);
-   brick_creation : for i in 0 to BRICK_NUMBER-1 generate
+   brick_row_creation : for i in 0 to ROW_NUMBER-1 generate
 	begin
-	   position_i(i) <= (x=>row_position.x+to_unsigned(60*i, x_pos'length), y=>row_position.y);
-	   brick_i : brick
-		port map(clk=>clk, rst=>rst, game_clk=>game_clk, brick_position=>position_i(i),
+	   position_i(i) <= (x=>to_unsigned(SPACE_POSITION_X, x_pos'length), y=>to_unsigned(60*i+SPACE_POSITION_Y, y_pos'length));
+	   brick_row : brick_row
+		port map(clk=>clk, rst=>rst, game_clk=>game_clk, row_position=>position_i(i),
 		         rgb_for_position=>rgb_for_position, rgb=>rgb_summary_vector(3*i+2 downto 3*i),
 					ball_position=>ball_position, ball_radius=>ball_radius,
-					brick_collision_vector=>collision_summary_vector(2*i+1 downto 2*i));
+					collision_vector=>collision_summary_vector(2*i+1 downto 2*i));
 	end generate;
 
 end Behavioral;
