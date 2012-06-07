@@ -48,7 +48,7 @@ begin
 	 ball_position <= current_position;
 	 ball_radius <= (others => '0');
 	 -- graphics
-	 rgb <= "010" when rgb_for_position.x >= current_position.x and rgb_for_position.x <= current_position.x + 5 and rgb_for_position.y <= current_position.y and rgb_for_position.y >= current_position.y-5 and State /= death else "000";
+	 rgb <= "010" when rgb_for_position.x >= current_position.x and rgb_for_position.x <= current_position.x + 2 and rgb_for_position.y <= current_position.y and rgb_for_position.y >= current_position.y-2 and State /= death else "000";
 	 -- movement
 	 horizontal_move <= movement_cnt(15 - to_integer(horizontal_velocity)) and not movement_cnt_old(15 - to_integer(horizontal_velocity)) and game_clk;
 	 vertical_move <= movement_cnt(15 - to_integer(vertical_velocity)) and not movement_cnt_old(15 - to_integer(vertical_velocity)) and game_clk;
@@ -176,7 +176,7 @@ begin
 					 -- state transitions
 					 if set_ball_active = '1' then
 					     NextState <= catched;
-					 elsif current_position.y = to_unsigned(479, y_pos'length) then
+					 elsif current_position.y = to_unsigned(239, y_pos'length) then
 					     NextState <= death;
 					 end if;
 				when catched =>
@@ -189,7 +189,7 @@ begin
 					     NextState <= moving;
 					 -- don't know in which world the following statement could be reached
 					 -- but for completness
-					 elsif current_position.y = to_unsigned(479, y_pos'length) then
+					 elsif current_position.y = to_unsigned(239, y_pos'length) then
 					     NextState <= death;
 					 end if;
 		  end case;

@@ -27,9 +27,9 @@ end entity paddle;
 architecture RTL of paddle is
 
 
-signal paddle_begin : unsigned (9 downto 0) := to_unsigned (280,10) ;
-signal paddle_begin_Next : unsigned (9 downto 0) := to_unsigned (280,10) ;
-signal paddle_size : sizeT := (x=>TO_UNSIGNED(60,x_pos'length), y=>TO_UNSIGNED(10,y_pos'length));
+signal paddle_begin : x_pos := to_unsigned (140, x_pos'length) ;
+signal paddle_begin_Next : x_pos := to_unsigned (140, x_pos'length) ;
+signal paddle_size : sizeT := (x=>TO_UNSIGNED(30,x_pos'length), y=>TO_UNSIGNED(5,y_pos'length));
 type tState is  (Start, Idle ,Ignore, Move_Right , Move_Left);
 signal State : tState := Idle;
 signal NextState : tState;
@@ -80,8 +80,8 @@ release_ball <= '1' when ps2_data = x"73" and ps2_strobe_edge = '1' else '0';
 stop <= '1' when ps2_data = x"F0" and ps2_strobe_edge = '1' else '0';
 action <= cnt(cnt'left) and not cnt_old(cnt_old'left);
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
-current_position <= (x => paddle_begin , y=>TO_UNSIGNED(450,y_pos'length));
-set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(450, y_pos'length) - 1 - ball_radius)); 
+current_position <= (x => paddle_begin , y=>TO_UNSIGNED(225,y_pos'length));
+set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(225, y_pos'length) - 1 - ball_radius)); 
 
 
 process (clk)
@@ -113,7 +113,7 @@ begin
   case (State) is 
   
     when Start =>  
-	   paddle_begin_Next <= to_unsigned (280,paddle_begin_Next'length) ;
+	   paddle_begin_Next <= to_unsigned (140,paddle_begin_Next'length) ;
 		NextState <= Idle;
 		
     when Idle => 
@@ -126,7 +126,7 @@ begin
 		end if;
 		
 	 when Move_Right =>
-	   if action = '1' and (paddle_begin + paddle_size.x)<= to_unsigned(639, paddle_begin'length) then 
+	   if action = '1' and (paddle_begin + paddle_size.x)<= to_unsigned(329, paddle_begin'length) then 
 		  paddle_begin_Next <= paddle_begin + 1;
 		end if;
 		if stop = '1' then
@@ -177,7 +177,7 @@ end process;
 process (rgb_for_position,paddle_begin,paddle_size)
 begin 
   rgb <= "000";
-  if (rgb_for_position.x > paddle_begin) and (rgb_for_position.x < (paddle_begin + paddle_size.x )) and (rgb_for_position.y > 450) and (rgb_for_position.y < 460)then 
+  if (rgb_for_position.x > paddle_begin) and (rgb_for_position.x < (paddle_begin + paddle_size.x )) and (rgb_for_position.y > 225) and (rgb_for_position.y < 230)then 
     rgb <= "100";
   end if;
 end process; -- Paddle Drawing

@@ -52,8 +52,10 @@ signal visible : STD_LOGIC := '0';
 begin
 visible <= '1' when cnt_h >= 144 and cnt_h <= 784 and cnt_v >= 31 and cnt_v <= 510 else '0';
 
-rgb_for_position.x <= cnt_h - 144 when visible = '1' else (others => '0');
-rgb_for_position.y <= cnt_v - 31 when visible = '1' else (others => '0');
+--rgb_for_position.x <= cnt_h - 144 when visible = '1' else (others => '0');
+--rgb_for_position.y <= cnt_v - 31 when visible = '1' else (others => '0');
+rgb_for_position.x <= cnt_h(9 downto 1) - 72 when visible = '1' else (others => '0');
+rgb_for_position.y <= cnt_v(8 downto 1) - 15 when visible = '1' else (others => '0');
 
 rgb_out <= rgb_in when visible = '1' else "000";
 
