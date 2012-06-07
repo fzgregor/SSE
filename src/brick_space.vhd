@@ -48,7 +48,7 @@ end entity brick_space;
 
 architecture Behavioral of brick_space is
    constant ROW_NUMBER : integer := 2;
-   constant BRICK_NUMBER : integer := 2;
+   constant BRICK_NUMBER : integer := 10;
 	constant SPACE_POSITION_X : integer := 40;
 	constant SPACE_POSITION_Y : integer := 20;
 		
@@ -91,7 +91,7 @@ begin
    row_creation : for row in 0 to ROW_NUMBER-1 generate
 	   brick_creation : for brick in 0 to BRICK_NUMBER-1 generate
 			brick_i : brick
-			port map(clk=>clk, rst=>rst, game_clk=>game_clk, brick_position=> (x=>to_unsigned(20*row+SPACE_POSITION_X, x_pos'length), y=>to_unsigned(60*brick+SPACE_POSITION_Y, y_pos'length)),
+			port map(clk=>clk, rst=>rst, game_clk=>game_clk, brick_position=>(x=>to_unsigned(60*brick+SPACE_POSITION_X, x_pos'length), y=>to_unsigned(20*row+SPACE_POSITION_Y, y_pos'length)),
 						rgb_for_position=>rgb_for_position, rgb=>rgb_summary_vector(3*((row*BRICK_NUMBER)+brick)+2 downto 3*((row*BRICK_NUMBER)+brick)),
 						ball_position=>ball_position, ball_radius=>ball_radius,
 						brick_collision_vector=>collision_summary_vector(2*((row*BRICK_NUMBER)+brick)+1 downto 2*((row*BRICK_NUMBER)+brick)));
