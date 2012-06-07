@@ -47,7 +47,7 @@ entity brick_space is
 end entity brick_space;
 
 architecture Behavioral of brick_space is
-   constant ROW_NUMBER : integer := 4;
+   constant ROW_NUMBER : integer := 2;
 	constant SPACE_POSITION_X : integer := 20;
 	constant SPACE_POSITION_Y : integer := 40;
 	
@@ -89,7 +89,7 @@ begin
    brick_row_creation : for i in 0 to ROW_NUMBER-1 generate
 	begin
 	   position_i(i) <= (x=>to_unsigned(SPACE_POSITION_X, x_pos'length), y=>to_unsigned(60*i+SPACE_POSITION_Y, y_pos'length));
-	   brick_row : brick_row
+	   brick_row_i : brick_row
 		port map(clk=>clk, rst=>rst, game_clk=>game_clk, row_position=>position_i(i),
 		         rgb_for_position=>rgb_for_position, rgb=>rgb_summary_vector(3*i+2 downto 3*i),
 					ball_position=>ball_position, ball_radius=>ball_radius,

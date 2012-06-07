@@ -24,6 +24,7 @@ end entity ball;
 architecture RTL of ball is
     signal current_position : positionT := (x=>to_unsigned(10, x_pos'length), y=>to_unsigned(10, y_pos'length));
     signal current_positionNext : positionT;
+	 
 	 -- state stuff
     type ballStateT is (death, moving, catched);
 	 signal State : ballStateT := death;
@@ -31,7 +32,7 @@ architecture RTL of ball is
 	 -- movement stuff
 	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
 	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
-	 signal horizontal_velocity : unsigned(3 downto 0) := "1000";
+	 signal horizontal_velocity : unsigned(3 downto 0) := "0001";
 	 signal vertical_velocity : unsigned(3 downto 0) := "1000";
 	 signal horizontal_move : std_logic := '0';
 	 signal vertical_move : std_logic := '0';
@@ -44,8 +45,8 @@ architecture RTL of ball is
 begin
     -- static things
 	 -- location
-    ball_radius <= (others => '0');
 	 ball_position <= current_position;
+	 ball_radius <= (others => '0');
 	 -- graphics
 	 rgb <= "010" when rgb_for_position.x >= current_position.x and rgb_for_position.x <= current_position.x + 5 and rgb_for_position.y <= current_position.y and rgb_for_position.y >= current_position.y-5 and State /= death else "000";
 	 -- movement
@@ -79,6 +80,60 @@ begin
 				collision_vector_old <= collision_vector;
 		  end if;
     end process;
+	 
+	 
+---- Zeichnen mit Bresenham-Algorithmus: flexibel mit ball_radius	 
+--process(rgb_for_position) 
+--
+--variable x : unsigned(4 downto 0);
+--variable y : unsigned(4 downto 0);
+--variable dx : signed(4 downto 0);
+--variable dy : unsigned(4 downto 0);
+--variable difference : signed(4 downto 0);
+--
+--begin 
+--	 rgb <= "000";
+--	 x:= ball_radius_tmp;
+--	 difference:= to_signed(to_integer(ball_radius_tmp),difference'length);	 
+--	 y:= to_unsigned(0,y'length);
+--	 	 
+--	 if 	(rgb_for_position.x = current_position.x +x ) and (rgb_for_position.y = current_position.y+y) then
+--		rgb <= "100";
+--	 end if;
+--	 while y < x loop 
+--		dy := (y sll 1) + 1 ;
+--		y := y + 1 ;
+--		difference := difference - to_signed(to_integer(dy),difference'length);
+--		
+--		if difference < 0 then
+--			 dx := to_signed ((1 - to_integer(x sll 1)),dx'length) ;  
+--			 x := x-1 ;
+--			 difference := difference - dx ;
+--		end if;
+--		
+--		if 	(rgb_for_position.x = current_position.x +x ) and (rgb_for_position.y = current_position.y+y) then
+--		rgb <= "100";
+--		elsif (rgb_for_position.x = current_position.x -x ) and (rgb_for_position.y = current_position.y+y) then
+--		rgb <= "100";
+--		elsif (rgb_for_position.x = current_position.x -x ) and (rgb_for_position.y = current_position.y-y) then
+--		rgb <= "100";
+--		elsif (rgb_for_position.x = current_position.x +x ) and (rgb_for_position.y = current_position.y-y) then
+--		rgb <= "100";
+--		elsif (rgb_for_position.x = current_position.x +y ) and (rgb_for_position.y = current_position.y+x) then
+--		rgb <= "100";
+--		elsif (rgb_for_position.x = current_position.x -y ) and (rgb_for_position.y = current_position.y+x) then
+--		rgb <= "100";
+--		elsif (rgb_for_position.x = current_position.x -y ) and (rgb_for_position.y = current_position.y-x) then
+--		rgb <= "100";
+--		elsif (rgb_for_position.x = current_position.x +y ) and (rgb_for_position.y = current_position.y-x) then
+--		rgb <= "100";
+--		end if;
+--		
+--	 end loop;
+--	
+--end process;
+
+	 
 	 
 	 -- state machine
 	 process(State, collision_vector, collision_vector_old, set_ball_active, current_position, horizontal_move, vertical_move, vertical_negative, horizontal_negative)

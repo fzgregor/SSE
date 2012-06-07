@@ -43,6 +43,7 @@ signal left_signal : std_logic:= '0';
 signal release_ball : std_logic := '0';
 signal stop : std_logic:= '0'; 
 
+
 type paddleState is (ball_catched, ball_free);
 signal State_1: paddleState := ball_catched ;
 signal NextState_1: paddleState;
@@ -81,6 +82,7 @@ action <= cnt(cnt'left) and not cnt_old(cnt_old'left);
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 current_position <= (x => paddle_begin , y=>TO_UNSIGNED(450,y_pos'length));
 set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(450, y_pos'length) - 1 - ball_radius)); 
+
 
 process (clk)
 begin

@@ -48,7 +48,7 @@ entity brick_row is
 end entity brick_row;
 
 architecture Behavioral of brick_row is
-   constant BRICK_NUMBER : integer := 10;
+   constant BRICK_NUMBER : integer := 2;
 	
    component brick
 	   port(clk                     : in  std_logic;

@@ -38,11 +38,6 @@ Zweck: Gameplay
 Aufwandsschätzung: 3h
 Beschreibung: In Abhängigkeit des Berührungspunktes und der aktuellen Paddlegeschwindigkeit wird die Ballbewegung(Richtung sowie Geschwindigkeit) beeinflusst.
 
-AP 5: Ballstatus in Ball-Komponente
------------------------------------
-Zweck: Erweiterbarkeit
-Aufwandsschätzung: 1h
-Beschreibung: Behandlung des Ballstatus Catched in der Ball-Komponente um später mehrere Bälle unterstüzen zu können.
 
 AP 6: Spiellogik
 ----------------
