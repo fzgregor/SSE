@@ -93,6 +93,7 @@ begin
 		port map(clk                    => clk,
 			     rst                     => rst,
 			     game_clk                => game_clk,
+				  level						  => to_unsigned(0, 3),
 			     rgb_for_position        => vga_pixel,
 			     rgb                     => rgb_summary_vector(8 downto 6),
 			     ball_position           => ball_position,
