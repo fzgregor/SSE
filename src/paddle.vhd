@@ -49,23 +49,10 @@ signal State_1: paddleState := ball_catched ;
 signal NextState_1: paddleState;
 
 signal current_position : positionT; -- left upper corner of paddle
-
-	
-
-	component collision_box
-		port(
-			 position         : in  positionT;
-			 size             : in  sizeT;
-			 ball_position    : in  positionT;
-			 ball_radius      : in  radiusT;
-			 collision_vector : out collision_vectorT);
-	end component collision_box;
-	
-	
 	
 begin
 
-	collision_box_inst : collision_box
+	collision_box_inst : entity work.collision_box
 		port map(
 			     position         => current_position,
 			     size             => paddle_size,
