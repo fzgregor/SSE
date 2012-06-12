@@ -52,10 +52,12 @@ architecture Behavioral of brick_space is
 	constant FIFO_ELEMENTS_LD : integer := 5;
 	constant SPACE_POSITION_Y : integer := 32;
 	-- bricks levels and so on
-	type spaceT is array(0 to 63) of std_logic_vector(0 to 329);
+	subtype rowsT is std_logic_vector(0 to 319);
+	type spaceT is array(0 to 63) of rowsT;
 	type levelsT is array(0 to 7) of spaceT;
+	type standard_rowsT is array(0 to 1) of rowsT;
 	signal alive : spaceT;
-	signal levels : levelsT;
+	signal levels : levelsT := (others=>(others=>(others=>'0')));
    -- the killer fifo
 	signal fifo_read : unsigned(FIFO_ELEMENTS_LD downto 0) := (others => '0');
 	signal fifo_write : unsigned(FIFO_ELEMENTS_LD downto 0) := (others => '0');
@@ -66,17 +68,23 @@ architecture Behavioral of brick_space is
 	signal kill_element_pos_old : positionT;
 begin
 	-- levels
-	levels(0)(0) <= (others => '0');
-	levels(0)(1) <= x"0FFFF0FFFF0FFFF0FFFF0FFFF0FFFF0FFFF0FFFF";
-	levels(0)(2) <= levels(0)(1);
-	levels(0)(3) <= levels(0)(1);
-	levels(0)(4) <= levels(0)(1);
-	levels(0)(5) <= levels(0)(1); 
-	levels(0)(6) <= (others => '0');
-	levels(0)(7) <= (others => '0');
-	levels(0)(8) <= (others => '0');
-	levels(0)(9) <= (others => '0');
-	levels(0)(10) <= (others => '0');
+	levels(0)(4) <= x"00FFFFFFFF00FFFFFFFF00FFFFFFFF00FFFFFFFF00FFFFFFFF00FFFFFFFF00FFFFFFFF00FFFFFF00";
+	levels(0)(5) <= levels(0)(4);
+	levels(0)(6) <= levels(0)(4);
+	levels(0)(7) <= levels(0)(4);
+	levels(0)(8) <= levels(0)(4);
+	levels(0)(9) <= levels(0)(4);
+	levels(0)(10) <= levels(0)(4);
+	levels(0)(11) <= levels(0)(4);
+	
+	levels(0)(16) <= levels(0)(4);
+	levels(0)(17) <= levels(0)(4);
+	levels(0)(18) <= levels(0)(4);
+	levels(0)(19) <= levels(0)(4);
+	levels(0)(20) <= levels(0)(4);
+	levels(0)(21) <= levels(0)(4);
+	levels(0)(22) <= levels(0)(4);
+	levels(0)(23) <= levels(0)(4);
 
    fifo_syncer : process(clk)
 	-- needed to insert new elements into kill fifo
@@ -93,8 +101,8 @@ begin
 	
 	level_setter : process(rst)
 	begin
-		if rst = '1'then
-			alive <= levels(to_integer(level));
+		if rst = '1' then
+			alive <= (others=>(others=>'1'));
 		end if;
 	end process;
 	
