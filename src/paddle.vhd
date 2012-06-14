@@ -18,9 +18,9 @@ entity paddle is
 		rgb : out rgbT;
 		-- collision detection
 		ball_position : in positionT;
-		ball_radius : in radiusT;
 		lives : in unsigned (2 downto 0);
 		lock : in std_logic;
+		collision_speed_effect_edge : out std_logic_vector(2 downto 0);
 		paddle_collision_vector : out collision_vectorT
 	);
 end entity paddle;
@@ -31,12 +31,12 @@ architecture RTL of paddle is
 
 signal paddle_begin : x_pos := to_unsigned (140, x_pos'length) ;
 signal paddle_begin_Next : x_pos := to_unsigned (140, x_pos'length) ;
-signal paddle_size : sizeT := (x=>TO_UNSIGNED(30,x_pos'length), y=>TO_UNSIGNED(5,y_pos'length));
+signal paddle_size : sizeT := (x=>TO_UNSIGNED(50,x_pos'length), y=>TO_UNSIGNED(5,y_pos'length));
 type tState is  (Start, Idle ,Ignore, Move_Right , Move_Left);
 signal State : tState := Idle;
 signal NextState : tState;
-signal cnt: unsigned (16 downto 0):= (others => '0') ;
-signal cnt_old: unsigned (16 downto 0):= (others => '0') ;
+signal cnt: unsigned (17 downto 0):= (others => '0') ;
+signal cnt_old: unsigned (17 downto 0):= (others => '0') ;
 signal ps2_strobe_old : std_logic;
 signal ps2_strobe_edge : std_logic;
 signal action : std_logic;
@@ -46,6 +46,11 @@ signal release_ball : std_logic := '0';
 signal stop : std_logic:= '0'; 
 signal aktive_x : std_logic:='0';
 
+signal paddle_collision_vector_tmp : collision_vectorT;
+signal paddle_collision_vector_tmp_old : collision_vectorT;
+signal paddle_collision_vector_tmp_edge : std_logic;
+signal collision_speed_effect: std_logic_vector(2 downto 0);
+
 type paddleState is (ball_catched, ball_free);
 signal State_1: paddleState := ball_catched ;
 signal NextState_1: paddleState;
@@ -53,7 +58,6 @@ signal NextState_1: paddleState;
 signal current_position : positionT; -- left upper corner of paddle
 	
 begin
- 
 right_signal <= '1' when ps2_data = x"74" and ps2_strobe_edge = '1' else '0';
 left_signal <= '1' when ps2_data = x"6B" and ps2_strobe_edge = '1' else '0';
 release_ball <= '1' when ps2_data = x"73" and ps2_strobe_edge = '1' else '0';
@@ -61,11 +65,11 @@ stop <= '1' when ps2_data = x"F0" and ps2_strobe_edge = '1' else '0';
 action <= cnt(cnt'left) and not cnt_old(cnt_old'left);
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 current_position <= (x => paddle_begin , y=>TO_UNSIGNED(225,y_pos'length));
-set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(225, y_pos'length) - 1 - ball_radius)); 
+set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(225, y_pos'length) - 1)); 
 
 -- collision detection
 
-aktive_x <= '1' when ((ball_position.x + ball_radius) >= current_position.x) and  ((current_position.x + paddle_size.x) >= (ball_position.x - ball_radius)) else '0';
+aktive_x <= '1' when ((ball_position.x) >= current_position.x) and  ((current_position.x + paddle_size.x) >= (ball_position.x)) else '0';
 
 process (clk)
 begin
@@ -81,18 +85,19 @@ begin
 		cnt_old <= cnt;
 		ps2_strobe_old <= ps2_strobe;
 		paddle_begin <= paddle_begin_Next;
+		paddle_collision_vector_tmp_old <= paddle_collision_vector_tmp;
 	 end if;
   end if;
 end process;
 
-process (ball_position,ball_radius,aktive_x,paddle_size,current_position)
+process (ball_position,aktive_x,paddle_size,current_position)
 begin
 
-paddle_collision_vector <= "00";
+paddle_collision_vector_tmp <= "00";
 		if aktive_x ='1' then 
 			
-			if (ball_position.y + ball_radius = current_position.y) or (ball_position.y - ball_radius = current_position.y + paddle_size.y) then 
-				paddle_collision_vector <= "10";
+			if (ball_position.y = current_position.y) or (ball_position.y = current_position.y + paddle_size.y) then 
+				paddle_collision_vector_tmp <= "10";
 			end if;
 		end if;
 end process;
@@ -195,5 +200,32 @@ begin
 	end if;
 	
 end process; -- Paddle and Lives Drawing
+
+-- effekt on ball speed according to collisions position
+
+
+--000     001                              010      011			code for signal "collision_speed_effect"
+------l--------l------------------------l--------l-------
+------l--------l------------------------l--------l-------
+
+process (paddle_collision_vector_tmp_edge,paddle_begin ,ball_position,paddle_size)
+begin
+	collision_speed_effect <= "111";
+	if paddle_collision_vector_tmp_edge = '1' then 
+		if ball_position.x <= paddle_begin + (paddle_size.x srl 3) then
+			collision_speed_effect <= "000";
+		elsif (ball_position.x  >=  paddle_begin+ (paddle_size.x srl 3)) and (ball_position.x <=  paddle_begin+ (paddle_size.x srl 2)) then
+			collision_speed_effect <= "001";
+		elsif (ball_position.x >=  paddle_begin+ ((3*paddle_size.x) srl 2)) and (ball_position.x <=  paddle_begin+ ((7*paddle_size.x) srl 3)) then
+			collision_speed_effect <= "010";
+		elsif (ball_position.x >=  paddle_begin+ ((7*paddle_size.x) srl 3)) then
+			collision_speed_effect <= "011";
+		end if;
+	end if;
+end process;
+
+paddle_collision_vector <= paddle_collision_vector_tmp;
+paddle_collision_vector_tmp_edge <= paddle_collision_vector_tmp(1) and not paddle_collision_vector_tmp_old(1);
+collision_speed_effect_edge <= collision_speed_effect when paddle_collision_vector_tmp_edge= '1' else "111";
 
 end architecture RTL;

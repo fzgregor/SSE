@@ -24,7 +24,6 @@ signal set_ball_position : positionT;
 signal catch_dead_ball : std_logic;
 -- collision stuff
 signal ball_position : positionT;
-signal ball_radius : radiusT;
 signal collision_summary_vector : std_logic_vector(5 downto 0);
 signal collision_vector : std_logic_vector(1 downto 0);
 -- graphic stuff
@@ -37,6 +36,7 @@ signal ps2_strobe : std_logic;
 -- clock stuff
 signal game_clk : std_logic;
 signal clk_25mhz : std_logic;
+signal collision_speed_effect : std_logic_vector(2 downto 0);
 
 -- die Anzahl der Leben wird in der  Paddle Komponente angezeigt da die Behandlung im Top-modul es kpmplizierter macht
 --in game_logic benoetigte Signale von oder in anderen Komponenten :
@@ -109,7 +109,7 @@ begin
 			     set_ball_position => set_ball_position,
 			     dead              => catch_dead_ball,
 			     ball_position     => ball_position,
-			     ball_radius	     => ball_radius,
+		 	     collision_speed_effect => collision_speed_effect,
 			     collision_vector  => collision_vector);
 	paddle_inst : entity work.paddle
 		port map(clk                     => clk,
@@ -125,7 +125,7 @@ begin
 				  lives 						  => lives,
 			     rgb                     => rgb_summary_vector(5 downto 3),
 			     ball_position           => ball_position,
-			     ball_radius             => ball_radius,
+				  collision_speed_effect_edge => collision_speed_effect,
 			     paddle_collision_vector => collision_summary_vector(1 downto 0));
 	brick_space_inst : entity work.brick_space
 		port map(clk                    => clk,
@@ -135,11 +135,9 @@ begin
 			     rgb_for_position        => vga_pixel,
 			     rgb                     => rgb_summary_vector(8 downto 6),
 			     ball_position           => ball_position,
-			     ball_radius             => ball_radius,
 			     collision_vector        => collision_summary_vector(3 downto 2));
 	screen_inst : entity work.screen
 		port map(ball_position    => ball_position,
-			     ball_radius      => ball_radius,
 			     collision_vector => collision_summary_vector(5 downto 4));
 	rgba_combiner_inst : entity work.combiner
 		generic map(set_number  => 3,

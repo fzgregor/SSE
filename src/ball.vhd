@@ -16,12 +16,14 @@ entity ball is
 		set_ball_position : in positionT;
 		dead : out std_logic; -- indicates ball death
 		ball_position : out positionT; -- current middle point of ball
-		ball_radius : out radiusT;
+		collision_speed_effect : in std_logic_vector(2 downto 0);
 		collision_vector : in collision_vectorT
 	);
 end entity ball;
 
 architecture RTL of ball is
+	 constant RADIUS : integer := 1;
+
     signal current_position : positionT := (x=>to_unsigned(10, x_pos'length), y=>to_unsigned(10, y_pos'length));
     signal current_positionNext : positionT;
 	 
@@ -32,8 +34,8 @@ architecture RTL of ball is
 	 -- movement stuff
 	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
 	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
-	 signal horizontal_velocity : unsigned(3 downto 0) := "0001";
-	 signal vertical_velocity : unsigned(3 downto 0) := "1000";
+	 signal horizontal_velocity : unsigned(3 downto 0) := "0011";
+	 signal vertical_velocity : unsigned(3 downto 0) := "0111";
 	 signal horizontal_move : std_logic := '0';
 	 signal vertical_move : std_logic := '0';
 	 signal horizontal_negative : std_logic := '0';
@@ -41,14 +43,16 @@ architecture RTL of ball is
 	 signal horizontal_negativeNext : std_logic;
 	 signal vertical_negativeNext : std_logic;
 	 signal collision_vector_old : collision_vectorT;
+	 
+	 signal change_horizontal_velocity : signed(2 downto 0);
+	 signal change_horizontal_velocity_old : signed(2 downto 0);
 	
 begin
     -- static things
 	 -- location
 	 ball_position <= current_position;
-	 ball_radius <= (others => '0');
 	 -- graphics
-	 rgb <= "010" when rgb_for_position.x >= current_position.x and rgb_for_position.x <= current_position.x + 2 and rgb_for_position.y <= current_position.y and rgb_for_position.y >= current_position.y-2 and State /= death else "000";
+	 rgb <= "010" when rgb_for_position.x >= current_position.x - RADIUS and rgb_for_position.x <= current_position.x + RADIUS and rgb_for_position.y <= current_position.y + RADIUS and rgb_for_position.y >= current_position.y - RADIUS and State /= death else "000";
 	 -- movement
 	 horizontal_move <= movement_cnt(15 - to_integer(horizontal_velocity)) and not movement_cnt_old(15 - to_integer(horizontal_velocity)) and game_clk;
 	 vertical_move <= movement_cnt(15 - to_integer(vertical_velocity)) and not movement_cnt_old(15 - to_integer(vertical_velocity)) and game_clk;
@@ -72,15 +76,50 @@ begin
 	 begin
 	     if rst = '1' then
 		      State <= death;
+				horizontal_velocity <= (others => '0');
+				vertical_velocity <= "0111";
 	     elsif rising_edge(clk) then
 		      State <= NextState;
 				current_position <= current_positionNext;
             vertical_negative <= vertical_negativeNext;
             horizontal_negative <= horizontal_negativeNext;
 				collision_vector_old <= collision_vector;
+				change_horizontal_velocity_old <= change_horizontal_velocity;
+				if change_horizontal_velocity_old /= change_horizontal_velocity then
+					if change_horizontal_velocity(2) = '1' and horizontal_velocity > unsigned(change_horizontal_velocity(1 downto 0)) then
+						horizontal_velocity <= horizontal_velocity - unsigned(change_horizontal_velocity(1 downto 0));
+					elsif horizontal_velocity < (x"1111" - unsigned(change_horizontal_velocity(1 downto 0))) then
+						horizontal_velocity <= horizontal_velocity + unsigned(change_horizontal_velocity(1 downto 0));
+					end if;
+				end if;
 		  end if;
     end process;
 	 
+	 collision_speed_effect_action : process(collision_speed_effect, horizontal_negative)
+	 begin
+		change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
+		if horizontal_negative = '0' then
+			if collision_speed_effect = "000" then
+				change_horizontal_velocity <= to_signed(-1, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "001" then
+				change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "010" then
+				change_horizontal_velocity <= to_signed(1, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "011" then
+				change_horizontal_velocity <= to_signed(2, change_horizontal_velocity'length);
+			end if; 
+		else
+			if collision_speed_effect = "000" then
+				change_horizontal_velocity <= to_signed(2, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "001" then
+				change_horizontal_velocity <= to_signed(1, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "010" then
+				change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "011" then
+				change_horizontal_velocity <= to_signed(-1, change_horizontal_velocity'length);
+			end if; 
+		end if;
+	 end process;
 	 
 ---- Zeichnen mit Bresenham-Algorithmus: flexibel mit ball_radius	 
 --process(rgb_for_position) 
