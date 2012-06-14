@@ -17,6 +17,7 @@ entity ball is
 		dead : out std_logic; -- indicates ball death
 		ball_position : out positionT; -- current middle point of ball
 		ball_radius : out radiusT;
+		collision_speed_effect : in std_logic_vector(2 downto 0);
 		collision_vector : in collision_vectorT
 	);
 end entity ball;
@@ -32,8 +33,8 @@ architecture RTL of ball is
 	 -- movement stuff
 	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
 	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
-	 signal horizontal_velocity : unsigned(3 downto 0) := "0001";
-	 signal vertical_velocity : unsigned(3 downto 0) := "1000";
+	 signal horizontal_velocity : unsigned(3 downto 0) := "0011";
+	 signal vertical_velocity : unsigned(3 downto 0) := "0101";
 	 signal horizontal_move : std_logic := '0';
 	 signal vertical_move : std_logic := '0';
 	 signal horizontal_negative : std_logic := '0';
@@ -81,6 +82,44 @@ begin
 		  end if;
     end process;
 	 
+-- effect of the collision position on the paddle on the horizontal and vertical speed of the ball movement.
+	 process (collision_speed_effect,horizontal_velocity,vertical_velocity,horizontal_negative)
+	 begin
+		if collision_speed_effect = "000" then
+			if horizontal_negative = '0' then
+				horizontal_velocity <= horizontal_velocity - to_unsigned(2,horizontal_velocity'length);
+--				vertical_velocity <= vertical_velocity +  to_unsigned(2,vertical_velocity'length);
+			else 
+				horizontal_velocity <= horizontal_velocity + 1;
+--				vertical_velocity <= vertical_velocity - 1;
+			end if;
+		elsif collision_speed_effect = "001" then
+			if horizontal_negative = '0' then
+				horizontal_velocity <= horizontal_velocity - to_unsigned(1,horizontal_velocity'length);
+--				vertical_velocity <= vertical_velocity +  to_unsigned(1,vertical_velocity'length);
+			else 
+				horizontal_velocity <= horizontal_velocity + 1;
+--				vertical_velocity <= vertical_velocity - 1;
+			end if;
+		elsif collision_speed_effect = "010" then
+			if horizontal_negative = '1' then
+				horizontal_velocity <= horizontal_velocity - to_unsigned(1,horizontal_velocity'length);
+--				vertical_velocity <= vertical_velocity +  to_unsigned(1,vertical_velocity'length);
+			else 
+				horizontal_velocity <= horizontal_velocity + 1;
+--				vertical_velocity <= vertical_velocity - 1;
+			end if;
+		elsif collision_speed_effect = "011" then
+			if horizontal_negative = '1' then
+				horizontal_velocity <= horizontal_velocity - to_unsigned(2,horizontal_velocity'length);
+--				vertical_velocity <= vertical_velocity +  to_unsigned(2,vertical_velocity'length);
+			else 
+				horizontal_velocity <= horizontal_velocity + 1;
+--				vertical_velocity <= vertical_velocity - 1;
+			end if;
+		end if;
+		
+	 end process;
 	 
 ---- Zeichnen mit Bresenham-Algorithmus: flexibel mit ball_radius	 
 --process(rgb_for_position) 

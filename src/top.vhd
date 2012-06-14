@@ -29,6 +29,7 @@ component ball
 		 dead              : out std_logic;
 		 ball_position     : out positionT;
 		 ball_radius	   : out radiusT;
+		 collision_speed_effect  : in std_logic_vector(2 downto 0);
 		 collision_vector  : in  collision_vectorT);
 end component ball;
 component brick_space
@@ -54,6 +55,7 @@ component paddle
 		 rgb                     : out rgbT;
 		 ball_position           : in  positionT;
 		 ball_radius             : in  radiusT;
+		 collision_speed_effect_edge : out std_logic_vector(2 downto 0);
 		 paddle_collision_vector : out collision_vectorT);
 end component paddle;
 component screen
@@ -116,6 +118,7 @@ signal ps2_strobe : std_logic;
 -- clock stuff
 signal game_clk : std_logic;
 signal clk_25mhz : std_logic;
+signal collision_speed_effect : std_logic_vector(2 downto 0);
 
 
 begin
@@ -153,6 +156,7 @@ begin
 			     dead              => catch_dead_ball,
 			     ball_position     => ball_position,
 			     ball_radius	     => ball_radius,
+				  collision_speed_effect => collision_speed_effect,
 			     collision_vector  => collision_vector);
 	paddle_inst : paddle
 		port map(clk                     => clk,
@@ -167,6 +171,7 @@ begin
 			     rgb                     => rgb_summary_vector(5 downto 3),
 			     ball_position           => ball_position,
 			     ball_radius             => ball_radius,
+				  collision_speed_effect_edge => collision_speed_effect,
 			     paddle_collision_vector => collision_summary_vector(1 downto 0));
 	brick_space_inst : brick_space
 		port map(clk                    => clk,
