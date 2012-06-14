@@ -94,8 +94,8 @@ begin
 		-- => 000, 010, 100 => true, 001, 011, 101 => false
 		-- x : 00,000 brick 11,000 void 100,000 brick 111,000 void 1000,000 brick 1011,000
 		-- => 0000, 0100, 1000 => true, 0011, 0111, 1011 => false
-		if(ball_position_without_offset_y(4) = '0' and ball_position_without_offset_y < 64) then ball_index_valid_y := '1'; else ball_index_valid_y := '0'; end if;
-		if(ball_position_without_offset_x(4 downto 3) = "00" and ball_position.x >= X_OFFSET and ball_position.x < 320) then ball_index_valid_x := '1'; else ball_index_valid_x := '0'; end if;
+		if(ball_position_without_offset_y(3) = '0' and ball_position_without_offset_y < 64) then ball_index_valid_y := '1'; else ball_index_valid_y := '0'; end if;
+		if(ball_position_without_offset_x(4 downto 3) /= "11" and ball_position.x >= X_OFFSET and ball_position.x < 320) then ball_index_valid_x := '1'; else ball_index_valid_x := '0'; end if;
 		debug <= ball_index_valid_x;
 		ball_index_valid <= ball_index_valid_x and ball_index_valid_y;
 		-- these are the collision lines
@@ -108,8 +108,8 @@ begin
 		rgb_without_offset_y := rgb_for_position.y - Y_OFFSET;
 		rgb_index_y <= rgb_without_offset_y(5 downto 4);
 		rgb_index_x <= rgb_without_offset_x(8 downto 5);
-		if(rgb_without_offset_y(4) = '0' and rgb_without_offset_y < 64) then rgb_index_valid_y := '1'; else rgb_index_valid_y := '0'; end if;
-		if(rgb_without_offset_x(4 downto 3) = "00" and rgb_for_position.x >= X_OFFSET and rgb_for_position.x < 320) then rgb_index_valid_x := '1'; else rgb_index_valid_x := '0'; end if;
+		if(rgb_without_offset_y(3) = '0' and rgb_without_offset_y < 64) then rgb_index_valid_y := '1'; else rgb_index_valid_y := '0'; end if;
+		if(rgb_without_offset_x(4 downto 3) /= "11" and rgb_for_position.x >= X_OFFSET and rgb_for_position.x < 320) then rgb_index_valid_x := '1'; else rgb_index_valid_x := '0'; end if;
 		rgb_index_valid <= rgb_index_valid_x and rgb_index_valid_y;	
 	end process;
 	
