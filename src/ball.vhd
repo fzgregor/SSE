@@ -35,7 +35,7 @@ architecture RTL of ball is
 	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
 	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
 	 signal horizontal_velocity : unsigned(3 downto 0) := "0011";
-	 signal vertical_velocity : unsigned(3 downto 0) := "0101";
+	 signal vertical_velocity : unsigned(3 downto 0) := "0111";
 	 signal horizontal_move : std_logic := '0';
 	 signal vertical_move : std_logic := '0';
 	 signal horizontal_negative : std_logic := '0';
@@ -43,6 +43,9 @@ architecture RTL of ball is
 	 signal horizontal_negativeNext : std_logic;
 	 signal vertical_negativeNext : std_logic;
 	 signal collision_vector_old : collision_vectorT;
+	 
+	 signal change_horizontal_velocity : signed(2 downto 0);
+	 signal change_horizontal_velocity_old : signed(2 downto 0);
 	
 begin
     -- static things
@@ -73,52 +76,49 @@ begin
 	 begin
 	     if rst = '1' then
 		      State <= death;
+				horizontal_velocity <= (others => '0');
+				vertical_velocity <= "0111";
 	     elsif rising_edge(clk) then
 		      State <= NextState;
 				current_position <= current_positionNext;
             vertical_negative <= vertical_negativeNext;
             horizontal_negative <= horizontal_negativeNext;
 				collision_vector_old <= collision_vector;
+				change_horizontal_velocity_old <= change_horizontal_velocity;
+				if change_horizontal_velocity_old /= change_horizontal_velocity then
+					if change_horizontal_velocity(2) = '1' and horizontal_velocity > unsigned(change_horizontal_velocity(1 downto 0)) then
+						horizontal_velocity <= horizontal_velocity - unsigned(change_horizontal_velocity(1 downto 0));
+					elsif horizontal_velocity < (x"1111" - unsigned(change_horizontal_velocity(1 downto 0))) then
+						horizontal_velocity <= horizontal_velocity + unsigned(change_horizontal_velocity(1 downto 0));
+					end if;
+				end if;
 		  end if;
     end process;
 	 
--- effect of the collision position on the paddle on the horizontal and vertical speed of the ball movement.
-	 process (collision_speed_effect,horizontal_velocity,vertical_velocity,horizontal_negative)
+	 collision_speed_effect_action : process(collision_speed_effect, horizontal_negative)
 	 begin
-		if collision_speed_effect = "000" then
-			if horizontal_negative = '0' then
-				horizontal_velocity <= horizontal_velocity - to_unsigned(2,horizontal_velocity'length);
---				vertical_velocity <= vertical_velocity +  to_unsigned(2,vertical_velocity'length);
-			else 
-				horizontal_velocity <= horizontal_velocity + 1;
---				vertical_velocity <= vertical_velocity - 1;
-			end if;
-		elsif collision_speed_effect = "001" then
-			if horizontal_negative = '0' then
-				horizontal_velocity <= horizontal_velocity - to_unsigned(1,horizontal_velocity'length);
---				vertical_velocity <= vertical_velocity +  to_unsigned(1,vertical_velocity'length);
-			else 
-				horizontal_velocity <= horizontal_velocity + 1;
---				vertical_velocity <= vertical_velocity - 1;
-			end if;
-		elsif collision_speed_effect = "010" then
-			if horizontal_negative = '1' then
-				horizontal_velocity <= horizontal_velocity - to_unsigned(1,horizontal_velocity'length);
---				vertical_velocity <= vertical_velocity +  to_unsigned(1,vertical_velocity'length);
-			else 
-				horizontal_velocity <= horizontal_velocity + 1;
---				vertical_velocity <= vertical_velocity - 1;
-			end if;
-		elsif collision_speed_effect = "011" then
-			if horizontal_negative = '1' then
-				horizontal_velocity <= horizontal_velocity - to_unsigned(2,horizontal_velocity'length);
---				vertical_velocity <= vertical_velocity +  to_unsigned(2,vertical_velocity'length);
-			else 
-				horizontal_velocity <= horizontal_velocity + 1;
---				vertical_velocity <= vertical_velocity - 1;
-			end if;
+		change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
+		if horizontal_negative = '0' then
+			if collision_speed_effect = "000" then
+				change_horizontal_velocity <= to_signed(-1, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "001" then
+				change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "010" then
+				change_horizontal_velocity <= to_signed(1, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "011" then
+				change_horizontal_velocity <= to_signed(2, change_horizontal_velocity'length);
+			end if; 
+		else
+			if collision_speed_effect = "000" then
+				change_horizontal_velocity <= to_signed(2, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "001" then
+				change_horizontal_velocity <= to_signed(1, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "010" then
+				change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
+			elsif collision_speed_effect = "011" then
+				change_horizontal_velocity <= to_signed(-1, change_horizontal_velocity'length);
+			end if; 
 		end if;
-		
 	 end process;
 	 
 ---- Zeichnen mit Bresenham-Algorithmus: flexibel mit ball_radius	 
