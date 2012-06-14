@@ -36,11 +36,11 @@ begin
 
 
 
- if ((ball_position.x - ball_radius = 0) or (ball_position.x + ball_radius = 639)) and (ball_position.y - ball_radius = 0) then 
+ if ((ball_position.x - ball_radius = 0) or (ball_position.x + ball_radius = 319)) and (ball_position.y - ball_radius = 20) then 
 	collision_vector <= "11"; 
- elsif (ball_position.x - ball_radius = 0) or (ball_position.x + ball_radius = 639) then 
+ elsif (ball_position.x - ball_radius = 0) or (ball_position.x + ball_radius = 319) then 
 	collision_vector <= "01";
- elsif (ball_position.y - ball_radius = 0) then
+ elsif (ball_position.y - ball_radius = 20) then
 	collision_vector <= "10";
  else 
 	collision_vector <= "00";

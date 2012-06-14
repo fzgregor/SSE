@@ -19,6 +19,8 @@ entity paddle is
 		-- collision detection
 		ball_position : in positionT;
 		ball_radius : in radiusT;
+		lives : in unsigned (2 downto 0);
+		lock : in std_logic;
 		paddle_collision_vector : out collision_vectorT
 	);
 end entity paddle;
@@ -42,7 +44,7 @@ signal right_signal : std_logic:= '0';
 signal left_signal : std_logic:= '0';
 signal release_ball : std_logic := '0';
 signal stop : std_logic:= '0'; 
-
+signal aktive_x : std_logic:='0';
 
 type paddleState is (ball_catched, ball_free);
 signal State_1: paddleState := ball_catched ;
@@ -51,16 +53,7 @@ signal NextState_1: paddleState;
 signal current_position : positionT; -- left upper corner of paddle
 	
 begin
-
-	collision_box_inst : entity work.collision_box
-		port map(
-			     position         => current_position,
-			     size             => paddle_size,
-			     ball_position    => ball_position,
-			     ball_radius      => ball_radius,
-			     collision_vector => paddle_collision_vector);
-
-   
+ 
 right_signal <= '1' when ps2_data = x"74" and ps2_strobe_edge = '1' else '0';
 left_signal <= '1' when ps2_data = x"6B" and ps2_strobe_edge = '1' else '0';
 release_ball <= '1' when ps2_data = x"73" and ps2_strobe_edge = '1' else '0';
@@ -70,6 +63,9 @@ ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 current_position <= (x => paddle_begin , y=>TO_UNSIGNED(225,y_pos'length));
 set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(225, y_pos'length) - 1 - ball_radius)); 
 
+-- collision detection
+
+aktive_x <= '1' when ((ball_position.x + ball_radius) >= current_position.x) and  ((current_position.x + paddle_size.x) >= (ball_position.x - ball_radius)) else '0';
 
 process (clk)
 begin
@@ -89,7 +85,17 @@ begin
   end if;
 end process;
 
+process (ball_position,ball_radius,aktive_x,paddle_size,current_position)
+begin
 
+paddle_collision_vector <= "00";
+		if aktive_x ='1' then 
+			
+			if (ball_position.y + ball_radius = current_position.y) or (ball_position.y - ball_radius = current_position.y + paddle_size.y) then 
+				paddle_collision_vector <= "10";
+			end if;
+		end if;
+end process;
 
 -- Paddle Movement
 process (State,cnt,paddle_begin,paddle_size,right_signal,left_signal,stop,action)
@@ -160,13 +166,34 @@ begin
 
 end process;
 
--- paddle Drawing
-process (rgb_for_position,paddle_begin,paddle_size)
+-- paddle and Lives Drawing
+process (rgb_for_position,paddle_begin,paddle_size,lives)
 begin 
   rgb <= "000";
   if (rgb_for_position.x > paddle_begin) and (rgb_for_position.x < (paddle_begin + paddle_size.x )) and (rgb_for_position.y > 225) and (rgb_for_position.y < 230)then 
     rgb <= "100";
   end if;
-end process; -- Paddle Drawing
+  if lives >= to_unsigned(7,lives'length) then
+		if rgb_for_position.x > to_unsigned(290,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(294,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
+			rgb <= "101";
+		end if;
+	end if;
+	if lives >= to_unsigned(5,lives'length) then
+		if rgb_for_position.x > to_unsigned(296,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(300,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
+			rgb <= "101";
+		end if;
+	end if;
+	if lives >= to_unsigned(3,lives'length) then
+		if rgb_for_position.x > to_unsigned(302,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(306,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
+			rgb <= "101";
+		end if;
+	end if;
+	if lives >= to_unsigned(1,lives'length) then
+		if rgb_for_position.x > to_unsigned(308,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(312,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
+			rgb <= "101";
+		end if;
+	end if;
+	
+end process; -- Paddle and Lives Drawing
 
 end architecture RTL;
