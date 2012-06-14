@@ -42,7 +42,9 @@ entity brick_space is
 		rgb : out rgbT;
 		-- collision detection
 		ball_position : in positionT;
-		collision_vector : out collision_vectorT
+		collision_vector : out collision_vectorT;
+		
+		space_empty : out std_logic
 	);
 end entity brick_space;
 
@@ -65,7 +67,10 @@ architecture Behavioral of brick_space is
 	signal alive : aliveT;
 	
 	signal debug: std_logic;
+	
 begin
+
+	space_empty <= '1' when (alive(0) or alive(1) or alive(2) or alive(3)) = "0000000000" else '0';
 
 	index_calculator : process (clk)
 	   variable ball_position_without_offset_x : x_pos;

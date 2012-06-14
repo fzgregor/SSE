@@ -116,14 +116,14 @@ begin
 	Level_Nr_tmp_next <= Level_Nr_tmp;
 	rst_level <= '0';
 	
-	if dead_edge ='1' then 
+	if dead_edge = '1' then 
 			Lives_tmp_next <= Lives_tmp - 1;
 	end if;
 	
 	case (State) is 
 	   
 		when start_screen =>
-			Level_Nr_tmp_next <= to_unsigned(1,Level_Nr_tmp'length);
+			Level_Nr_tmp_next <= to_unsigned(0,Level_Nr_tmp'length);
 			Lives_tmp_next <= to_unsigned(7,Lives_tmp'length);
 			lock <= '1';
 			if Start_Signal = '1' then
@@ -472,7 +472,7 @@ begin
 			END IF;
 		--/L
 		-- level_Nr draw 
-			if Level_Nr_tmp = to_unsigned(1,Level_Nr_tmp'length) then 
+			if Level_Nr_tmp = to_unsigned(0,Level_Nr_tmp'length) then 
 				--1
 				IF (((rgb_y_479 = 310 )) AND ((rgb_x_639 >= x_Position+1) AND (rgb_x_639 <= x_Position+4))) OR
 					(((rgb_x_639 = x_Position+2)) AND ((rgb_y_479 >= 300) AND (rgb_y_479 <= 310))) OR
@@ -481,7 +481,7 @@ begin
 						rgb <= "101";	
 				END IF;
 				--/1
-			elsif Level_Nr_tmp = to_unsigned(2,Level_Nr_tmp'length) then
+			elsif Level_Nr_tmp = to_unsigned(1,Level_Nr_tmp'length) then
 				--2
 				IF ((rgb_y_479 = 300 OR(rgb_y_479 >= 305 AND rgb_y_479 <= 310)) AND ((rgb_x_639 = x_Position))) OR
 					((rgb_y_479 = 300 OR rgb_y_479 = 305 OR rgb_y_479 = 310) AND ((rgb_x_639 = x_Position+1))) OR
@@ -491,14 +491,14 @@ begin
 						rgb <= "101";			
 				END IF;
 				--/2
-			elsif Level_Nr_tmp = to_unsigned(3,Level_Nr_tmp'length) then
+			elsif Level_Nr_tmp = to_unsigned(2,Level_Nr_tmp'length) then
 				--3
 				IF ((rgb_y_479 = 300 OR rgb_y_479 = 305 OR rgb_y_479 <= 310) AND ((rgb_x_639 >= x_Position) and (rgb_x_639 <= x_Position+4))) OR
 					((rgb_y_479 >= 301 AND rgb_y_479 <= 309) AND ((rgb_x_639 = x_Position+4))) THEN
 						rgb <= "101";			
 				END IF;
 				--/3
-			elsif Level_Nr_tmp = to_unsigned(4,Level_Nr_tmp'length) then
+			elsif Level_Nr_tmp = to_unsigned(3,Level_Nr_tmp'length) then
 				--4
 				IF ((rgb_y_479 = 305) AND ((rgb_x_639 >= x_Position) and (rgb_x_639 <= x_Position+4))) OR
 					((rgb_y_479 >= 301 AND rgb_y_479 <= 304) AND ((rgb_x_639 = x_Position))) OR 

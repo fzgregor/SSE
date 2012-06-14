@@ -34,8 +34,8 @@ architecture RTL of ball is
 	 -- movement stuff
 	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
 	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
-	 signal horizontal_velocity : unsigned(3 downto 0) := "0011";
-	 signal vertical_velocity : unsigned(3 downto 0) := "0111";
+	 signal horizontal_velocity : unsigned(3 downto 0);
+	 signal vertical_velocity : unsigned(3 downto 0);
 	 signal horizontal_move : std_logic := '0';
 	 signal vertical_move : std_logic := '0';
 	 signal horizontal_negative : std_logic := '0';
@@ -74,22 +74,28 @@ begin
 	 -- state changing register
 	 process(clk, rst)
 	 begin
-	     if rst = '1' then
-		      State <= death;
-				horizontal_velocity <= (others => '0');
-				vertical_velocity <= "0111";
-	     elsif rising_edge(clk) then
-		      State <= NextState;
-				current_position <= current_positionNext;
-            vertical_negative <= vertical_negativeNext;
-            horizontal_negative <= horizontal_negativeNext;
-				collision_vector_old <= collision_vector;
-				change_horizontal_velocity_old <= change_horizontal_velocity;
-				if change_horizontal_velocity_old /= change_horizontal_velocity then
-					if change_horizontal_velocity(2) = '1' and horizontal_velocity > unsigned(change_horizontal_velocity(1 downto 0)) then
-						horizontal_velocity <= horizontal_velocity - unsigned(change_horizontal_velocity(1 downto 0));
-					elsif horizontal_velocity < (x"1111" - unsigned(change_horizontal_velocity(1 downto 0))) then
-						horizontal_velocity <= horizontal_velocity + unsigned(change_horizontal_velocity(1 downto 0));
+		  if rising_edge(clk) then
+			   if rst = '1' or State = death then
+					if State /= death then
+						State <= death;
+					else
+						State <= NextState;
+					end if;
+					horizontal_velocity <= "0011";
+					vertical_velocity <= "0111";
+				else
+					State <= NextState;
+					current_position <= current_positionNext;
+					vertical_negative <= vertical_negativeNext;
+					horizontal_negative <= horizontal_negativeNext;
+					collision_vector_old <= collision_vector;
+					change_horizontal_velocity_old <= change_horizontal_velocity;
+					if change_horizontal_velocity_old /= change_horizontal_velocity then
+						if change_horizontal_velocity < 0 and horizontal_velocity > unsigned(change_horizontal_velocity(1 downto 0)) then
+							horizontal_velocity <= horizontal_velocity - unsigned(change_horizontal_velocity(1 downto 0));
+						elsif horizontal_velocity < (x"1111" - unsigned(change_horizontal_velocity(1 downto 0))) then
+							horizontal_velocity <= horizontal_velocity + unsigned(change_horizontal_velocity(1 downto 0));
+						end if;
 					end if;
 				end if;
 		  end if;

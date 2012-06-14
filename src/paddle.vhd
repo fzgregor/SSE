@@ -94,11 +94,8 @@ process (ball_position,aktive_x,paddle_size,current_position)
 begin
 
 paddle_collision_vector_tmp <= "00";
-		if aktive_x ='1' then 
-			
-			if (ball_position.y = current_position.y) or (ball_position.y = current_position.y + paddle_size.y) then 
-				paddle_collision_vector_tmp <= "10";
-			end if;
+		if aktive_x ='1' and (ball_position.y = current_position.y) then 
+			paddle_collision_vector_tmp <= "10";
 		end if;
 end process;
 
@@ -176,7 +173,7 @@ process (rgb_for_position,paddle_begin,paddle_size,lives)
 begin 
   rgb <= "000";
   if (rgb_for_position.x > paddle_begin) and (rgb_for_position.x < (paddle_begin + paddle_size.x )) and (rgb_for_position.y > 225) and (rgb_for_position.y < 230)then 
-    rgb <= "100";
+    rgb <= "001";
   end if;
   if lives >= to_unsigned(7,lives'length) then
 		if rgb_for_position.x > to_unsigned(290,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(294,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then

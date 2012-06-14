@@ -66,7 +66,7 @@ begin
 					rgb 					=> rgb_from_logic,
 					ps2_data 			=> ps2_data,
 					ps2_strobe 			=> ps2_strobe,
-					space_empty 		=> '0',
+					space_empty 		=> space_empty,
 					dead 					=> catch_dead_ball,
 					rst_level 			=> rst_level,
 					rgb_decider 		=> rgb_decider,
@@ -135,6 +135,7 @@ begin
 			     rgb_for_position        => vga_pixel,
 			     rgb                     => rgb_summary_vector(8 downto 6),
 			     ball_position           => ball_position,
+				  space_empty				  => space_empty,
 			     collision_vector        => collision_summary_vector(3 downto 2));
 	screen_inst : entity work.screen
 		port map(ball_position    => ball_position,
