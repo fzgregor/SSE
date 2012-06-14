@@ -119,7 +119,8 @@ begin
 		if ball_index_valid = '1' then
 			if alive(to_integer(ball_index_y))(to_integer(ball_index_x)) = '1' and 
 			   (horizontal_collision_line = '1' or vertical_collision_line = '1') then
-				collision_vector <= horizontal_collision_line & vertical_collision_line;
+				collision_vector(0) <= vertical_collision_line;
+				collision_vector(1) <= horizontal_collision_line;
 				unset_alive <= (y=>ball_index_y, x=>ball_index_x);
 			end if;
 		end if;
@@ -143,7 +144,7 @@ begin
 	
 	rgb_writer : process(rgb_index_y, rgb_index_x, rgb_index_valid, alive)
 	begin
-		if rgb_index_valid = '1' then
+		if alive(to_integer(rgb_index_y))(to_integer(rgb_index_x)) = '1' and rgb_index_valid = '1' then
 			rgb <= "100";
 		else
 			rgb <= "000";

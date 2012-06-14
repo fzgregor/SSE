@@ -163,7 +163,7 @@ process (rgb_for_position,paddle_begin,paddle_size)
 begin 
   rgb <= "000";
   if (rgb_for_position.x > paddle_begin) and (rgb_for_position.x < (paddle_begin + paddle_size.x )) and (rgb_for_position.y > 225) and (rgb_for_position.y < 230)then 
-    rgb <= "100";
+    rgb <= "001";
   end if;
 end process; -- Paddle Drawing
 

@@ -26,11 +26,10 @@ aktive_x <= '1' when (ball_position.x >= position.x) and  ((position.x + size.x)
 -- dito y
 aktive_y <= '1' when (ball_position.y >= position.y) and  ((position.y + size.y) >= ball_position.y) else '0';
 
-process (ball_position,ball_radius,aktive_x,aktive_y,size,position)
+process (ball_position,aktive_x,aktive_y,size,position)
 begin
 	collision_vector <= "00";
 	if aktive_x ='1' then 
-		
 		if ball_position.y = position.y then 
 			collision_vector(1) <= '1';
 		end if;
