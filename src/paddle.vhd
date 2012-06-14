@@ -18,7 +18,6 @@ entity paddle is
 		rgb : out rgbT;
 		-- collision detection
 		ball_position : in positionT;
-		ball_radius : in radiusT;
 		collision_speed_effect_edge : out std_logic_vector(2 downto 0);
 		paddle_collision_vector : out collision_vectorT
 	);
@@ -54,28 +53,14 @@ signal State_1: paddleState := ball_catched ;
 signal NextState_1: paddleState;
 
 signal current_position : positionT; -- left upper corner of paddle
-
-	
-
-	component collision_box
-		port(
-			 position         : in  positionT;
-			 size             : in  sizeT;
-			 ball_position    : in  positionT;
-			 ball_radius      : in  radiusT;
-			 collision_vector : out collision_vectorT);
-	end component collision_box;
-	
-	
 	
 begin
 
-	collision_box_inst : collision_box
+	collision_box_inst : entity work.collision_box
 		port map(
 			     position         => current_position,
 			     size             => paddle_size,
 			     ball_position    => ball_position,
-			     ball_radius      => ball_radius,
 			     collision_vector => paddle_collision_vector_tmp);
 
    
@@ -86,7 +71,7 @@ stop <= '1' when ps2_data = x"F0" and ps2_strobe_edge = '1' else '0';
 action <= cnt(cnt'left) and not cnt_old(cnt_old'left);
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 current_position <= (x => paddle_begin , y=>TO_UNSIGNED(225,y_pos'length));
-set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(225, y_pos'length) - 1 - ball_radius)); 
+set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(225, y_pos'length) - 1)); 
 
 
 process (clk)
@@ -208,7 +193,7 @@ process (rgb_for_position,paddle_begin,paddle_size)
 begin 
   rgb <= "000";
   if (rgb_for_position.x > paddle_begin) and (rgb_for_position.x < (paddle_begin + paddle_size.x )) and (rgb_for_position.y > 225) and (rgb_for_position.y < 230)then 
-    rgb <= "100";
+    rgb <= "001";
   end if;
 end process; -- Paddle Drawing
 paddle_collision_vector <= paddle_collision_vector_tmp;

@@ -2,15 +2,15 @@
 -- Company: 
 -- Engineer:
 --
--- Create Date:   17:25:54 05/28/2012
+-- Create Date:   00:33:35 06/14/2012
 -- Design Name:   
--- Module Name:   /home/live/workspace/sse/top_test.vhd
+-- Module Name:   /home/live/workspace/sse/brick_space_test.vhd
 -- Project Name:  brickout
 -- Target Device:  
 -- Tool versions:  
 -- Description:   
 -- 
--- VHDL Test Bench Created by ISE for module: brickout_game
+-- VHDL Test Bench Created by ISE for module: brick_space
 -- 
 -- Dependencies:
 -- 
@@ -27,59 +27,46 @@
 --------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+Use ieee.numeric_std.all;
+USE work.types.all;
  
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY top_test IS
-END top_test;
+ENTITY brick_space_test IS
+END brick_space_test;
  
-ARCHITECTURE behavior OF top_test IS 
- 
-    -- Component Declaration for the Unit Under Test (UUT)
- 
-    COMPONENT brickout_game
-    PORT(
-         clk : IN  std_logic;
-         rst : IN  std_logic;
-         ps2_data_raw : INOUT  std_logic;
-         ps2_clk : INOUT  std_logic;
-         rgb_to_screen : OUT  std_logic_vector(2 downto 0);
-         h_sync : OUT  std_logic;
-         v_sync : OUT  std_logic
-        );
-    END COMPONENT;
-    
+ARCHITECTURE behavior OF brick_space_test IS 
 
    --Inputs
    signal clk : std_logic := '0';
    signal rst : std_logic := '0';
-
-	--BiDirs
-   signal ps2_data_raw : std_logic;
-   signal ps2_clk : std_logic;
+   signal game_clk : std_logic := '0';
+   signal level : levelT := to_unsigned(1, levelT'length);
+   signal position : positionT := (others=> (others=> '0'));
+   signal ball_radius : radiusT := (others => '0');
 
  	--Outputs
-   signal rgb_to_screen : std_logic_vector(2 downto 0);
-   signal h_sync : std_logic;
-   signal v_sync : std_logic;
+   signal rgb : rgbT;
+   signal collision_vector : collision_vectorT;
 
    -- Clock period definitions
    constant clk_period : time := 10 ns;
-   constant ps2_clk_period : time := 10 ns;
  
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: brickout_game PORT MAP (
+   uut: entity work.brick_space PORT MAP (
           clk => clk,
           rst => rst,
-          ps2_data_raw => ps2_data_raw,
-          ps2_clk => ps2_clk,
-          rgb_to_screen => rgb_to_screen,
-          h_sync => h_sync,
-          v_sync => v_sync
+          game_clk => game_clk,
+          level => level,
+          rgb_for_position => position,
+          rgb => rgb,
+          ball_position => position,
+          ball_radius => ball_radius,
+          collision_vector => collision_vector
         );
 
    -- Clock process definitions
@@ -91,29 +78,26 @@ BEGIN
 		wait for clk_period/2;
    end process;
  
-   ps2_clk_process :process
-   begin
-		ps2_clk <= '0';
-		wait for ps2_clk_period/2;
-		ps2_clk <= '1';
-		wait for ps2_clk_period/2;
-   end process;
- 
 
    -- Stimulus process
    stim_proc: process
    begin		
-      -- hold reset state for 100 ns.
-      wait for 100 ns;	
-
-      wait for clk_period*10;
+      wait for clk_period;
 		rst <= '1';
       wait for clk_period;
 		rst <= '0';
-
-      -- insert stimulus here 
+--		position.x <= to_unsigned(4, x_pos'length);
+--		position.y <= to_unsigned(32, y_pos'length);
 
       wait;
    end process;
+	
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			position.x <= position.x + 2;
+			position.y <= position.y + 1;
+		end if;
+	end process;
 
 END;
