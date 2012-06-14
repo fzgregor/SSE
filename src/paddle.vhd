@@ -18,7 +18,6 @@ entity paddle is
 		rgb : out rgbT;
 		-- collision detection
 		ball_position : in positionT;
-		ball_radius : in radiusT;
 		paddle_collision_vector : out collision_vectorT
 	);
 end entity paddle;
@@ -57,7 +56,6 @@ begin
 			     position         => current_position,
 			     size             => paddle_size,
 			     ball_position    => ball_position,
-			     ball_radius      => ball_radius,
 			     collision_vector => paddle_collision_vector);
 
    
@@ -68,7 +66,7 @@ stop <= '1' when ps2_data = x"F0" and ps2_strobe_edge = '1' else '0';
 action <= cnt(cnt'left) and not cnt_old(cnt_old'left);
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 current_position <= (x => paddle_begin , y=>TO_UNSIGNED(225,y_pos'length));
-set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(225, y_pos'length) - 1 - ball_radius)); 
+set_ball_position <= (x => (paddle_begin + (paddle_size.x srl 1)) , y => (to_unsigned(225, y_pos'length) - 1)); 
 
 
 process (clk)

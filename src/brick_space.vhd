@@ -42,7 +42,6 @@ entity brick_space is
 		rgb : out rgbT;
 		-- collision detection
 		ball_position : in positionT;
-		ball_radius : in radiusT;
 		collision_vector : out collision_vectorT
 	);
 end entity brick_space;

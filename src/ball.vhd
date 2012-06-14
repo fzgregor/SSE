@@ -16,12 +16,13 @@ entity ball is
 		set_ball_position : in positionT;
 		dead : out std_logic; -- indicates ball death
 		ball_position : out positionT; -- current middle point of ball
-		ball_radius : out radiusT;
 		collision_vector : in collision_vectorT
 	);
 end entity ball;
 
 architecture RTL of ball is
+	 constant RADIUS : integer := 1;
+
     signal current_position : positionT := (x=>to_unsigned(10, x_pos'length), y=>to_unsigned(10, y_pos'length));
     signal current_positionNext : positionT;
 	 
@@ -46,9 +47,8 @@ begin
     -- static things
 	 -- location
 	 ball_position <= current_position;
-	 ball_radius <= (others => '0');
 	 -- graphics
-	 rgb <= "010" when rgb_for_position.x >= current_position.x and rgb_for_position.x <= current_position.x + 2 and rgb_for_position.y <= current_position.y and rgb_for_position.y >= current_position.y-2 and State /= death else "000";
+	 rgb <= "010" when rgb_for_position.x >= current_position.x - RADIUS and rgb_for_position.x <= current_position.x + RADIUS and rgb_for_position.y <= current_position.y + RADIUS and rgb_for_position.y >= current_position.y - RADIUS and State /= death else "000";
 	 -- movement
 	 horizontal_move <= movement_cnt(15 - to_integer(horizontal_velocity)) and not movement_cnt_old(15 - to_integer(horizontal_velocity)) and game_clk;
 	 vertical_move <= movement_cnt(15 - to_integer(vertical_velocity)) and not movement_cnt_old(15 - to_integer(vertical_velocity)) and game_clk;
