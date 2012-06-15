@@ -45,7 +45,7 @@ entity game_logic is
 		rst_level : out std_logic;
 		rgb_decider : out std_logic;
 		level_nr : out levelT;
-		lives : out unsigned (2 downto 0)
+		lives : out livesT
 		);
 end game_logic;
 
@@ -60,8 +60,8 @@ signal Level_Nr_tmp_next :levelT;
 signal ps2_strobe_old : std_logic;
 signal ps2_strobe_edge : std_logic;
 signal cnt : unsigned (27 downto 0):=(others =>'0');
-signal Lives_tmp : unsigned(2 downto 0);
-signal Lives_tmp_next : unsigned(2 downto 0);
+signal Lives_tmp : livesT;
+signal Lives_tmp_next : livesT;
 signal dead_edge: std_logic;
 signal dead_old: std_logic;
 signal Start_Signal: std_logic;

@@ -27,7 +27,7 @@ signal ball_position : positionT;
 signal collision_summary_vector : std_logic_vector(5 downto 0);
 signal collision_vector : std_logic_vector(1 downto 0);
 -- graphic stuff
-signal rgb_summary_vector : std_logic_vector(8 downto 0);
+signal rgb_summary_vector : std_logic_vector(11 downto 0);
 signal rgb_to_vga_component : rgbT;
 signal vga_pixel : positionT;
 -- ps2 stuff
@@ -56,6 +56,11 @@ signal rgb_y_479 : unsigned (8 downto 0);
 begin
 
 	rgb_to_vga_component <= rgb_from_logic when rgb_decider = '1' else rgb_from_combiner;
+	lives_indicator_inst : entity work.lives_indicator
+		port map(rgb_for_position => vga_pixel,
+					lives => lives,
+					rgb => rgb_summary_vector(11 downto 9)
+					);
 	
 	game_logic_inst : entity work.game_logic
 		port map(clk 					=> clk,
@@ -137,8 +142,8 @@ begin
 	screen_inst : entity work.screen
 		port map(ball_position    => ball_position,
 			     collision_vector => collision_summary_vector(5 downto 4));
-	rgba_combiner_inst : entity work.combiner
-		generic map(set_number  => 3,
+	rgb_combiner_inst : entity work.combiner
+		generic map(set_number  => 4,
 			        set_length  => 3)
 		port map(clk    => clk,
 			     rst    => rst,

@@ -157,27 +157,6 @@ begin
   if (rgb_for_position.x > paddle_begin) and (rgb_for_position.x < (paddle_begin + PADDLE_SIZE_X )) and (rgb_for_position.y > 225) and (rgb_for_position.y < 230)then 
     rgb <= "001";
   end if;
-  if lives >= to_unsigned(7,lives'length) then
-		if rgb_for_position.x > to_unsigned(290,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(294,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
-			rgb <= "101";
-		end if;
-	end if;
-	if lives >= to_unsigned(5,lives'length) then
-		if rgb_for_position.x > to_unsigned(296,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(300,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
-			rgb <= "101";
-		end if;
-	end if;
-	if lives >= to_unsigned(3,lives'length) then
-		if rgb_for_position.x > to_unsigned(302,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(306,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
-			rgb <= "101";
-		end if;
-	end if;
-	if lives >= to_unsigned(1,lives'length) then
-		if rgb_for_position.x > to_unsigned(308,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(312,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
-			rgb <= "101";
-		end if;
-	end if;
-	
 end process; -- Paddle and Lives Drawing
 
 -- effekt on ball speed according to collisions position
