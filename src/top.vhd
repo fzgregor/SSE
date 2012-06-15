@@ -55,7 +55,7 @@ signal rgb_y_479 : unsigned (8 downto 0);
 begin
 
 	rgb_to_vga_component <= rgb_from_logic when rgb_decider = '1' else rgb_from_combiner;
-	lives_indicator_inst : entity work.lives_indicator
+	live_indicator_inst : entity work.live_indicator
 		port map(rgb_for_position => vga_pixel,
 					lives => lives,
 					rgb => rgb_summary_vector(11 downto 9)

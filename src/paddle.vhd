@@ -64,7 +64,7 @@ ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 current_position <= (x => paddle_begin , y=>TO_UNSIGNED(225,y_pos'length));
 set_ball_position <= (x => (paddle_begin + (PADDLE_SIZE_X/2)) , y => (to_unsigned(225, y_pos'length) - 1)); 
 
-collision_detection : process (ball_position,aktive_x,current_position)
+collision_detection : process (ball_position,current_position)
 begin
 	paddle_collision_vector_tmp <= "00";
 	if ball_position.x >= current_position.x and  
