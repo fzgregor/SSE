@@ -7,7 +7,6 @@ entity paddle is
 	port (
 		clk : in std_logic;
 		rst : in std_logic;
-		game_clk : in std_logic; -- next game action 
 		catch_ball : in std_logic; -- catch the ball onto the paddle
 		ps2_data : in std_logic_vector (7 downto 0);
 		ps2_strobe : in std_logic;

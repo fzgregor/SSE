@@ -34,7 +34,6 @@ signal vga_pixel : positionT;
 signal ps2_data : std_logic_vector(7 downto 0);
 signal ps2_strobe : std_logic;
 -- clock stuff
-signal game_clk : std_logic;
 signal clk_25mhz : std_logic;
 signal collision_speed_effect : std_logic_vector(2 downto 0);
 
@@ -90,7 +89,6 @@ begin
 	clock_generator_inst : entity work.clock_generator
 		port map(clk       => clk,
 			     rst       => rst,
-			     game_clk  => game_clk,
 			     clk_25mhz => clk_25mhz);
 	vga_inst : entity work.vga
 		port map(clk25             => clk_25mhz,
@@ -105,7 +103,6 @@ begin
 	ball_inst : entity work.ball
 		port map(clk               => clk,
 			     rst               => rst_level,
-			     game_clk          => game_clk,
 			     rgb_for_position  => vga_pixel,
 			     rgb               => rgb_summary_vector(2 downto 0),
 			     set_ball_active   => set_ball_active,
@@ -117,7 +114,6 @@ begin
 	paddle_inst : entity work.paddle
 		port map(clk                     => clk,
 			     rst                     => rst_level,
-			     game_clk                => game_clk,
 			     catch_ball              => catch_dead_ball,
 			     ps2_data                => ps2_data,
 			     ps2_strobe              => ps2_strobe,
@@ -132,7 +128,6 @@ begin
 	brick_space_inst : entity work.brick_space
 		port map(clk                    => clk,
 			     rst                     => rst_level,
-			     game_clk                => game_clk,
 				  level						  => level_nr,
 			     rgb_for_position        => vga_pixel,
 			     rgb                     => rgb_summary_vector(8 downto 6),
@@ -147,7 +142,6 @@ begin
 			        set_length  => 3)
 		port map(clk    => clk,
 			     rst    => rst,
-				  game_clk => game_clk,
 			     input  => rgb_summary_vector,
 			     output => rgb_from_combiner);
 	collision_combiner_inst : entity work.combiner
@@ -155,7 +149,6 @@ begin
 			        set_length  => 2)
 		port map(clk    => clk,
 			     rst    => rst,
-				  game_clk => game_clk,
 			     input  => collision_summary_vector,
 			     output => collision_vector);
 	

@@ -35,7 +35,6 @@ entity brick_space is
 	port (
 		clk : in std_logic;
 		rst : in std_logic;
-		game_clk : in std_logic; -- next game action
 		level : in levelT;
 		-- visible representation
 		rgb_for_position : in positionT;

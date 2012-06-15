@@ -6,7 +6,6 @@ entity clock_generator is
 	port (
 		clk : in std_logic;
 		rst : in std_logic;
-		game_clk : out std_logic;
 		clk_25mhz : out std_logic
 	);
 end entity clock_generator;
@@ -31,7 +30,6 @@ begin
 	end if;
 end process;
 
-clk_25mhz <= '1' when cnt(0)= '1' else '0'; -- 25 MHz for the vga componen									  ++			  	  ++
-game_clk <= cnt(cnt'left) and not cnt_old(cnt_old'left); -- 48 KHz clk edge as game clk -------------  -------------  --------------
+clk_25mhz <= '1' when cnt(0)= '1' else '0'; -- 25 MHz for the vga component
 
 end architecture RTL;

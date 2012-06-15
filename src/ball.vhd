@@ -7,7 +7,6 @@ entity ball is
 	port (
 		clk : in std_logic;
 		rst : in std_logic;
-		game_clk : in std_logic; -- next game action
 		-- visible representation
 		rgb_for_position : in positionT;
 		rgb : out rgbT;
@@ -32,8 +31,8 @@ architecture RTL of ball is
 	 signal State : ballStateT := death;
 	 signal NextState : ballStateT;
 	 -- movement stuff
-	 signal movement_cnt : unsigned (15 downto 0) := (others => '0');
-	 signal movement_cnt_old : unsigned (15 downto 0) := (others => '0');
+	 signal movement_cnt : unsigned (24 downto 0) := (others => '0');
+	 signal movement_cnt_old : unsigned (24 downto 0) := (others => '0');
 	 signal horizontal_velocity : unsigned(3 downto 0);
 	 signal vertical_velocity : unsigned(3 downto 0);
 	 signal horizontal_move : std_logic := '0';
@@ -54,15 +53,15 @@ begin
 	 -- graphics
 	 rgb <= "010" when rgb_for_position.x >= current_position.x - RADIUS and rgb_for_position.x <= current_position.x + RADIUS and rgb_for_position.y <= current_position.y + RADIUS and rgb_for_position.y >= current_position.y - RADIUS and State /= death else "000";
 	 -- movement
-	 horizontal_move <= movement_cnt(15 - to_integer(horizontal_velocity)) and not movement_cnt_old(15 - to_integer(horizontal_velocity)) and game_clk;
-	 vertical_move <= movement_cnt(15 - to_integer(vertical_velocity)) and not movement_cnt_old(15 - to_integer(vertical_velocity)) and game_clk;
+	 horizontal_move <= movement_cnt(24 - to_integer(horizontal_velocity)) and not movement_cnt_old(24 - to_integer(horizontal_velocity));
+	 vertical_move <= movement_cnt(24 - to_integer(vertical_velocity)) and not movement_cnt_old(24 - to_integer(vertical_velocity));
 	 
-	 process(game_clk, rst)
+	 process(clk, rst)
 	 begin
 	     if rst = '1' then
 				movement_cnt <= (others => '0');
-		  elsif rising_edge(game_clk) then
-		      if movement_cnt(14 downto 0) = (14 downto 0 => '1') then
+		  elsif rising_edge(clk) then
+		      if movement_cnt(23 downto 0) = (23 downto 0 => '1') then
 				    movement_cnt <= (others => '0');
 			   else
 				    movement_cnt <= movement_cnt + 1;

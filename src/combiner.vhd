@@ -9,7 +9,6 @@ entity combiner is
 	port (
 		clk : in std_logic;
 		rst : in std_logic;
-		game_clk : in std_logic;
 		input : in std_logic_vector(set_number*set_length-1 downto 0);
 		output : out std_logic_vector(set_length-1 downto 0)
 	);
@@ -30,7 +29,6 @@ begin
 			             set_length  => set_length)
 		    port map(clk    => clk,
                              rst    => rst,
-                             game_clk => game_clk,
                              input  => input(set_length*set_number-1 downto set_length),
                              output => temp);
 	     output <= temp or input(set_length-1 downto 0);
