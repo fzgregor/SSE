@@ -44,7 +44,6 @@ entity game_logic is
 		dead : in std_logic;
 		rst_level : out std_logic;
 		rgb_decider : out std_logic;
-		lock : out std_logic;
 		level_nr : out levelT;
 		lives : out unsigned (2 downto 0)
 		);
@@ -110,7 +109,6 @@ end process;
 process (State,Start_Signal,cnt(cnt'left),Lives_tmp,space_empty,Level_Nr_tmp,rst,dead_edge)
 begin
 	NextState <= State;
-	lock <= '0';
 	rgb_decider <='1';
 	lives_tmp_next <= lives_tmp;
 	Level_Nr_tmp_next <= Level_Nr_tmp;
@@ -125,7 +123,6 @@ begin
 		when start_screen =>
 			Level_Nr_tmp_next <= to_unsigned(0,Level_Nr_tmp'length);
 			Lives_tmp_next <= to_unsigned(7,Lives_tmp'length);
-			lock <= '1';
 			if Start_Signal = '1' then
 				--cnt <= (others => '0');
 				rst_level <= '1';

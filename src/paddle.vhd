@@ -19,7 +19,6 @@ entity paddle is
 		-- collision detection
 		ball_position : in positionT;
 		lives : in unsigned (2 downto 0);
-		lock : in std_logic;
 		collision_speed_effect_edge : out std_logic_vector(2 downto 0);
 		paddle_collision_vector : out collision_vectorT
 	);

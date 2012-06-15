@@ -43,7 +43,6 @@ signal collision_speed_effect : std_logic_vector(2 downto 0);
 signal space_empty : std_logic; 									 --von space
 signal rst_level: std_logic; 	-- in space
 signal rgb_decider : std_logic; -- in top
-signal lock : std_logic; -- in paddle
 signal level_nr: levelT;-- in space
 signal lives : unsigned (2 downto 0); -- in Paddle 
 
@@ -70,7 +69,6 @@ begin
 					dead 					=> catch_dead_ball,
 					rst_level 			=> rst_level,
 					rgb_decider 		=> rgb_decider,
-					lock 					=> lock,
 					level_nr 			=> level_nr,
 					lives					=> lives	
 					);
@@ -117,7 +115,6 @@ begin
 			     game_clk                => game_clk,
 			     catch_ball              => catch_dead_ball,
 			     ps2_data                => ps2_data,
-				  lock 						  => lock,
 			     ps2_strobe              => ps2_strobe,
 			     set_ball_strobe         => set_ball_active,
 			     set_ball_position       => set_ball_position,
