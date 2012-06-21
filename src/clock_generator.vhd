@@ -12,9 +12,7 @@ end entity clock_generator;
 
 architecture RTL of clock_generator is
 	
-signal cnt : unsigned(9 downto 0):= (others => '0');
-signal cnt_old : unsigned (9 downto 0):= (others => '0');
-
+signal cnt : unsigned(0 downto 0):= (others => '0');
  
 begin
 	
@@ -25,7 +23,6 @@ begin
 			cnt <= (others => '0');
 		else 
 			cnt <= cnt+1;
-			cnt_old <= cnt;
 		end if; 
 	end if;
 end process;

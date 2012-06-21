@@ -42,6 +42,7 @@ entity game_logic is
 		ps2_strobe : in std_logic;
 		space_empty : in std_logic;
 		dead : in std_logic;
+		catch_ball : out std_logic;
 		rst_level : out std_logic;
 		rgb_decider : out std_logic;
 		level_nr : out levelT;
@@ -59,28 +60,24 @@ signal Level_Nr_tmp_next :levelT;
 
 signal ps2_strobe_old : std_logic;
 signal ps2_strobe_edge : std_logic;
-signal cnt : unsigned (27 downto 0):=(others =>'0');
+signal cnt : unsigned (1 downto 0):=(others =>'0'); --27
 signal Lives_tmp : livesT;
 signal Lives_tmp_next : livesT;
 signal dead_edge: std_logic;
 signal dead_old: std_logic;
 signal Start_Signal: std_logic;
 signal max_level_nr : unsigned (2 downto 0);
---signal x_count: integer range 0 to 2000;
---signal y_count: integer range 0 to 2000;
 
 
 
 begin
 
-Start_Signal <= '1' when ps2_data = x"5A" and ps2_strobe_edge = '1' else '0';
+dead_edge <= '1' when dead = '1' and dead_old = '0' else '0';
+Start_Signal <= '1';-- when ps2_data = x"5A" and ps2_strobe_edge = '1' else '0';
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 level_nr <= Level_Nr_tmp;
 lives <= Lives_tmp;
 max_level_nr <= to_unsigned(4,max_level_nr'length);
-dead_edge <= '1' when dead = '1' and dead_old = '0' else '0';
---x_count <= to_integer (rgb_x_639);
---y_count <= to_integer (rgb_y_479);
 
 process (clk,rst)
 begin
@@ -106,44 +103,43 @@ begin
 	end if;
 end process;
 
-process (State,Start_Signal,cnt(cnt'left),Lives_tmp,space_empty,Level_Nr_tmp,rst,dead_edge)
+process (State,Start_Signal,cnt(cnt'left),Lives_tmp,space_empty,Level_Nr_tmp,dead, rst)
 begin
 	NextState <= State;
 	rgb_decider <='1';
 	lives_tmp_next <= lives_tmp;
 	Level_Nr_tmp_next <= Level_Nr_tmp;
-	rst_level <= '0';
-	
-	if dead_edge = '1' then 
-			Lives_tmp_next <= Lives_tmp - 1;
-	end if;
+	rst_level <= rst;
+	catch_ball <= '0';
 	
 	case (State) is 
 	   
 		when start_screen =>
 			Level_Nr_tmp_next <= to_unsigned(0,Level_Nr_tmp'length);
-			Lives_tmp_next <= to_unsigned(7,Lives_tmp'length);
+			Lives_tmp_next <= to_unsigned(4,Lives_tmp'length);
 			if Start_Signal = '1' then
-				--cnt <= (others => '0');
-				rst_level <= '1';
 				NextState <= level_x;
-				
 			end if;
 			
 		when level_x =>
-			rst_level <='1';
+			rst_level <= '1';
 			if cnt(cnt'left) = '1' then 
-				rst_level <= '1';
+				rst_level <= '0';
 				NextState <= playing;
+				catch_ball <= '1';
 			end if;
 			
 		when playing =>
-		
 			rgb_decider <= '0';
-			
-			if Lives_tmp = to_unsigned(0,Lives_tmp'length) then 
-				NextState <= game_over;
+			if dead_edge = '1' then
+				if lives_tmp > to_unsigned(0, lives_tmp'length) then
+					lives_tmp_next <= lives_tmp - 1;
+					catch_ball <= '1';
+				else
+					NextState <= game_over;
+				end if;
 			end if;
+				
 			if space_empty ='1' then 
 				if Level_Nr_tmp = max_level_nr then 
 					NextState <= you_win;
@@ -153,20 +149,6 @@ begin
 					NextState <= level_x;
 				end if;
 			end if;
-			
-		when you_win =>
-			if rst= '1' then 
-				rst_level <= '1';
-				NextState <= start_screen;
-				
-			end if;
-			
-		when game_over =>
-			if rst= '1' then 
-				rst_level <= '1';
-				NextState <= start_screen;
-			end if;
-		
 		when others => Null;
 	end case;
 		

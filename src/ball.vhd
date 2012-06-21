@@ -180,7 +180,7 @@ begin
 	 
 	 
 	 -- state machine
-	 process(State, collision_vector, collision_vector_old, set_ball_active, current_position, horizontal_move, vertical_move, vertical_negative, horizontal_negative)
+	 process(State, collision_vector, collision_vector_old, set_ball_active, current_position, horizontal_move, vertical_move, vertical_negative, horizontal_negative, set_ball_position)
 	 begin
 	     -- standard output to prevent latches
 	     NextState <= State;
@@ -231,10 +231,6 @@ begin
 					 -- state transitions
 					 if set_ball_active = '0' then
 					     NextState <= moving;
-					 -- don't know in which world the following statement could be reached
-					 -- but for completness
-					 elsif current_position.y = to_unsigned(239, y_pos'length) then
-					     NextState <= death;
 					 end if;
 		  end case;
 	 end process;

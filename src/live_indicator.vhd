@@ -44,17 +44,18 @@ begin
 
 rgb_writer : process(lives, rgb_for_position)
 begin
-   if lives >= to_unsigned(7,lives'length) then
+	rgb <= "000";
+   if lives >= to_unsigned(4,lives'length) then
 		if rgb_for_position.x > to_unsigned(290,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(294,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
 			rgb <= "101";
 		end if;
 	end if;
-	if lives >= to_unsigned(5,lives'length) then
+	if lives >= to_unsigned(3,lives'length) then
 		if rgb_for_position.x > to_unsigned(296,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(300,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
 			rgb <= "101";
 		end if;
 	end if;
-	if lives >= to_unsigned(3,lives'length) then
+	if lives >= to_unsigned(2,lives'length) then
 		if rgb_for_position.x > to_unsigned(302,rgb_for_position.x'length) and rgb_for_position.x < to_unsigned(306,rgb_for_position.x'length) and rgb_for_position.y > to_unsigned(4,rgb_for_position.y'length) and rgb_for_position.y < to_unsigned(8,rgb_for_position.y'length) then
 			rgb <= "101";
 		end if;

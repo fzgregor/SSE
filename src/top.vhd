@@ -22,6 +22,7 @@ architecture RTL of brickout_game is
 signal set_ball_active : std_logic;
 signal set_ball_position : positionT;
 signal catch_dead_ball : std_logic;
+signal dead_ball : std_logic;
 -- collision stuff
 signal ball_position : positionT;
 signal collision_summary_vector : std_logic_vector(5 downto 0);
@@ -70,7 +71,8 @@ begin
 					ps2_data 			=> ps2_data,
 					ps2_strobe 			=> ps2_strobe,
 					space_empty 		=> space_empty,
-					dead 					=> catch_dead_ball,
+					dead 					=> dead_ball,
+					catch_ball        => catch_dead_ball,
 					rst_level 			=> rst_level,
 					rgb_decider 		=> rgb_decider,
 					level_nr 			=> level_nr,
@@ -107,7 +109,7 @@ begin
 			     rgb               => rgb_summary_vector(2 downto 0),
 			     set_ball_active   => set_ball_active,
 			     set_ball_position => set_ball_position,
-			     dead              => catch_dead_ball,
+			     dead              => dead_ball,
 			     ball_position     => ball_position,
 		 	     collision_speed_effect => collision_speed_effect,
 			     collision_vector  => collision_vector);

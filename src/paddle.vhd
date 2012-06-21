@@ -79,7 +79,7 @@ begin
   if rising_edge (clk) then 
     if rst = '1' then 
 		State <= Start;
-		State_1 <= ball_catched;
+		State_1 <= ball_free;
 		cnt <= (others => '0');
 	 else 
 	   State <= NextState;

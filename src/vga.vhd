@@ -55,7 +55,7 @@ begin
 visible <= '1' when cnt_h >= 144 and cnt_h <= 784 and cnt_v >= 31 and cnt_v <= 510 else '0';
 
 rgb_x_639 <= cnt_h - 144 when visible = '1' else (others => '0');
-rgb_y_479 <= cnt_v - 31 when visible = '1' else (others => '0');
+rgb_y_479 <= cnt_v(8 downto 0) - 31 when visible = '1' else (others => '0');
 
 rgb_for_position.x <= cnt_h(9 downto 1) - 72 when visible = '1' else (others => '0');
 rgb_for_position.y <= cnt_v(8 downto 1) - 15 when visible = '1' else (others => '0');
