@@ -65,8 +65,6 @@ architecture Behavioral of brick_space is
 	signal unset_alive_old : unset_aliveT;
 	signal alive : aliveT;
 	
-	signal debug: std_logic;
-	
 begin
 
 	space_empty <= '1' when (alive(0) or alive(1) or alive(2) or alive(3)) = "0000000000" else '0';
@@ -99,27 +97,50 @@ begin
 			-- => 000, 010, 100 => true, 001, 011, 101 => false
 			-- x : 00,000 brick 11,000 void 100,000 brick 111,000 void 1000,000 brick 1011,000
 			-- => 0000, 0100, 1000 => true, 0011, 0111, 1011 => false
-			if(ball_position_without_offset_y(3) = '0' and ball_position_without_offset_y < 64) then ball_index_valid_y := '1'; else ball_index_valid_y := '0'; end if;
-			if(ball_position_without_offset_x(4 downto 3) /= "11" and ball_position.x >= X_OFFSET and ball_position.x < 320) then ball_index_valid_x := '1'; else ball_index_valid_x := '0'; end if;
-			debug <= ball_index_valid_x;
+			if(ball_position_without_offset_y(3) = '0' and ball_position_without_offset_y < 64) then
+				ball_index_valid_y := '1';
+			else
+				ball_index_valid_y := '0';
+			end if;
+			if(ball_position_without_offset_x(4 downto 3) /= "11" and ball_position.x >= X_OFFSET and ball_position.x < 320) then
+				ball_index_valid_x := '1';
+			else
+				ball_index_valid_x := '0';
+			end if;
 			ball_index_valid <= ball_index_valid_x and ball_index_valid_y;
 			-- these are the collision lines
 			-- if the ball is on one of these lines and the brick is alive we're colliding
-			if(ball_position_without_offset_y(2 downto 0) = "000" or ball_position_without_offset_y(2 downto 0) = "111") then horizontal_collision_line <= '1'; else horizontal_collision_line <= '0'; end if;
-			if(ball_position_without_offset_x(3 downto 0) = "0000" or ball_position_without_offset_x(3 downto 0) = "1000") then vertical_collision_line <= '1'; else vertical_collision_line <= '0'; end if;
+			if ball_position_without_offset_y(2 downto 0) = "000" then
+				horizontal_collision_line <= '1';
+			else
+				horizontal_collision_line <= '0';
+			end if;
+			if(ball_position_without_offset_x(4 downto 0) = "11000" or ball_position_without_offset_x(4 downto 0) = "00000") then
+				vertical_collision_line <= '1';
+			else
+				vertical_collision_line <= '0';
+			end if;
 			
 			-- and now the same thing for rgb once again
 			rgb_without_offset_x := rgb_for_position.x - X_OFFSET;
 			rgb_without_offset_y := rgb_for_position.y - Y_OFFSET;
 			rgb_index_y <= rgb_without_offset_y(5 downto 4);
 			rgb_index_x <= rgb_without_offset_x(8 downto 5);
-			if(rgb_without_offset_y(3) = '0' and rgb_without_offset_y < 64) then rgb_index_valid_y := '1'; else rgb_index_valid_y := '0'; end if;
-			if(rgb_without_offset_x(4 downto 3) /= "11" and rgb_for_position.x >= X_OFFSET and rgb_for_position.x < 320) then rgb_index_valid_x := '1'; else rgb_index_valid_x := '0'; end if;
+			if(rgb_without_offset_y(3) = '0' and rgb_without_offset_y < 64) then
+				rgb_index_valid_y := '1';
+			else
+				rgb_index_valid_y := '0';
+			end if;
+			if(rgb_without_offset_x(4 downto 3) /= "11" and rgb_for_position.x >= X_OFFSET and rgb_for_position.x < 320) then
+				rgb_index_valid_x := '1';
+			else
+				rgb_index_valid_x := '0';
+			end if;
 			rgb_index_valid <= rgb_index_valid_x and rgb_index_valid_y;	
 		end if;
 	end process;
 	
-	collision_detection : process(ball_index_y, ball_index_x, ball_index_valid, horizontal_collision_line, vertical_collision_line, alive)
+	collision_detection : process(ball_index_y, ball_index_x, ball_index_valid, horizontal_collision_line, vertical_collision_line, alive, unset_alive_old)
 	begin
 		collision_vector <= "00";
 		unset_alive <= unset_alive_old;

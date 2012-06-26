@@ -60,7 +60,7 @@ signal Level_Nr_tmp_next :levelT;
 
 signal ps2_strobe_old : std_logic;
 signal ps2_strobe_edge : std_logic;
-signal cnt : unsigned (1 downto 0):=(others =>'0'); --27
+signal cnt : unsigned (27 downto 0):=(others =>'0');
 signal Lives_tmp : livesT;
 signal Lives_tmp_next : livesT;
 signal dead_edge: std_logic;
@@ -73,7 +73,7 @@ signal max_level_nr : unsigned (2 downto 0);
 begin
 
 dead_edge <= '1' when dead = '1' and dead_old = '0' else '0';
-Start_Signal <= '1';-- when ps2_data = x"5A" and ps2_strobe_edge = '1' else '0';
+Start_Signal <= '1' when ps2_data = x"5A" and ps2_strobe_edge = '1' else '0';
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 level_nr <= Level_Nr_tmp;
 lives <= Lives_tmp;
@@ -103,7 +103,7 @@ begin
 	end if;
 end process;
 
-process (State,Start_Signal,cnt(cnt'left),Lives_tmp,space_empty,Level_Nr_tmp,dead, rst)
+process (State,Start_Signal,cnt(cnt'left),Lives_tmp,space_empty,Level_Nr_tmp,dead_edge, rst)
 begin
 	NextState <= State;
 	rgb_decider <='1';

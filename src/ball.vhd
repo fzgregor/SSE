@@ -90,9 +90,14 @@ begin
 					collision_vector_old <= collision_vector;
 					change_horizontal_velocity_old <= change_horizontal_velocity;
 					if change_horizontal_velocity_old /= change_horizontal_velocity then
-						if change_horizontal_velocity < 0 and horizontal_velocity > unsigned(change_horizontal_velocity(1 downto 0)) then
-							horizontal_velocity <= horizontal_velocity - unsigned(change_horizontal_velocity(1 downto 0));
-						elsif horizontal_velocity < (x"1111" - unsigned(change_horizontal_velocity(1 downto 0))) then
+						if change_horizontal_velocity < 0 then
+							if horizontal_velocity > to_unsigned(0, horizontal_velocity'length) then
+								horizontal_velocity <= horizontal_velocity - 1;
+							else
+								horizontal_velocity <= "0010";
+								horizontal_negative <= not horizontal_negative;
+							end if;
+						elsif horizontal_velocity < (x"1001" - unsigned(change_horizontal_velocity(1 downto 0))) then
 							horizontal_velocity <= horizontal_velocity + unsigned(change_horizontal_velocity(1 downto 0));
 						end if;
 					end if;

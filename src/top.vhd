@@ -122,7 +122,6 @@ begin
 			     set_ball_strobe         => set_ball_active,
 			     set_ball_position       => set_ball_position,
 			     rgb_for_position        => vga_pixel,
-				  lives 						  => lives,
 			     rgb                     => rgb_summary_vector(5 downto 3),
 			     ball_position           => ball_position,
 				  collision_speed_effect_edge => collision_speed_effect,
@@ -142,16 +141,12 @@ begin
 	rgb_combiner_inst : entity work.combiner
 		generic map(set_number  => 4,
 			        set_length  => 3)
-		port map(clk    => clk,
-			     rst    => rst,
-			     input  => rgb_summary_vector,
+		port map(input  => rgb_summary_vector,
 			     output => rgb_from_combiner);
 	collision_combiner_inst : entity work.combiner
 		generic map(set_number  => 3,
 			        set_length  => 2)
-		port map(clk    => clk,
-			     rst    => rst,
-			     input  => collision_summary_vector,
+		port map(input  => collision_summary_vector,
 			     output => collision_vector);
 	
 end architecture RTL;
