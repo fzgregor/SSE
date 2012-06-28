@@ -159,7 +159,6 @@ end process; -- Paddle and Lives Drawing
 
 -- effekt on ball speed according to collisions position
 
-
 --000     001                              010      011			code for signal "collision_speed_effect"
 ------l--------l------------------------l--------l-------
 ------l--------l------------------------l--------l-------
@@ -168,13 +167,13 @@ process (paddle_collision_tmp_edge,paddle_begin ,ball_position)
 begin
 	collision_speed_effect <= "111";
 	if paddle_collision_tmp_edge = '1' then 
-		if ball_position.x <= paddle_begin + (PADDLE_SIZE_X/8) then
+		if ball_position.x <= paddle_begin + (PADDLE_SIZE_X/6) then
 			collision_speed_effect <= "000";
-		elsif (ball_position.x  >=  paddle_begin+ (PADDLE_SIZE_X/8)) and (ball_position.x <=  paddle_begin+ (PADDLE_SIZE_X/4)) then
+		elsif (ball_position.x  >=  paddle_begin+ (PADDLE_SIZE_X/6)) and (ball_position.x <=  paddle_begin+ (PADDLE_SIZE_X/3)) then
 			collision_speed_effect <= "001";
-		elsif (ball_position.x >=  paddle_begin+ ((3*PADDLE_SIZE_X)/4)) and (ball_position.x <=  paddle_begin+ ((7*PADDLE_SIZE_X)/8)) then
+		elsif (ball_position.x >=  paddle_begin+ ((2*PADDLE_SIZE_X)/3)) and (ball_position.x <=  paddle_begin+ ((5*PADDLE_SIZE_X)/6)) then
 			collision_speed_effect <= "010";
-		elsif (ball_position.x >=  paddle_begin+ ((7*PADDLE_SIZE_X)/8)) then
+		elsif (ball_position.x >=  paddle_begin+ ((5*PADDLE_SIZE_X)/6)) then
 			collision_speed_effect <= "011";
 		end if;
 	end if;
