@@ -77,7 +77,7 @@ Start_Signal <= '1' when ps2_data = x"5A" and ps2_strobe_edge = '1' else '0';
 ps2_strobe_edge <= ps2_strobe and not ps2_strobe_old;
 level_nr <= Level_Nr_tmp;
 lives <= Lives_tmp;
-max_level_nr <= to_unsigned(4,max_level_nr'length);
+max_level_nr <= to_unsigned(3,max_level_nr'length);
 
 process (clk,rst)
 begin
@@ -149,6 +149,7 @@ begin
 					NextState <= level_x;
 				end if;
 			end if;
+		
 		when others => Null;
 	end case;
 		
@@ -472,7 +473,7 @@ begin
 				--/2
 			elsif Level_Nr_tmp = to_unsigned(2,Level_Nr_tmp'length) then
 				--3
-				IF ((rgb_y_479 = 300 OR rgb_y_479 = 305 OR rgb_y_479 <= 310) AND ((rgb_x_639 >= x_Position) and (rgb_x_639 <= x_Position+4))) OR
+				IF ((rgb_y_479 = 300 OR rgb_y_479 = 305 OR rgb_y_479 = 310) AND ((rgb_x_639 >= x_Position) and (rgb_x_639 <= x_Position+4))) OR
 					((rgb_y_479 >= 301 AND rgb_y_479 <= 309) AND ((rgb_x_639 = x_Position+4))) THEN
 						rgb <= "101";			
 				END IF;
