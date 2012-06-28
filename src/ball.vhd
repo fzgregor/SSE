@@ -91,13 +91,13 @@ begin
 					change_horizontal_velocity_old <= change_horizontal_velocity;
 					if change_horizontal_velocity_old /= change_horizontal_velocity then
 						if change_horizontal_velocity < 0 then
-							if horizontal_velocity > to_unsigned(0, horizontal_velocity'length) then
-								horizontal_velocity <= horizontal_velocity - 1;
+							if horizontal_velocity > to_unsigned(1, horizontal_velocity'length) then
+								horizontal_velocity <= horizontal_velocity - 2;
 							else
 								horizontal_velocity <= "0010";
 								horizontal_negative <= not horizontal_negative;
 							end if;
-						elsif horizontal_velocity < (x"1001" - unsigned(change_horizontal_velocity(1 downto 0))) then
+						elsif horizontal_velocity + unsigned(change_horizontal_velocity(1 downto 0)) <= to_unsigned(8, horizontal_velocity'length) then
 							horizontal_velocity <= horizontal_velocity + unsigned(change_horizontal_velocity(1 downto 0));
 						end if;
 					end if;
@@ -110,23 +110,23 @@ begin
 		change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
 		if horizontal_negative = '0' then
 			if collision_speed_effect = "000" then
-				change_horizontal_velocity <= to_signed(-1, change_horizontal_velocity'length);
+				change_horizontal_velocity <= to_signed(-2, change_horizontal_velocity'length);
 			elsif collision_speed_effect = "001" then
 				change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
 			elsif collision_speed_effect = "010" then
 				change_horizontal_velocity <= to_signed(1, change_horizontal_velocity'length);
 			elsif collision_speed_effect = "011" then
-				change_horizontal_velocity <= to_signed(2, change_horizontal_velocity'length);
+				change_horizontal_velocity <= to_signed(3, change_horizontal_velocity'length);
 			end if; 
 		else
 			if collision_speed_effect = "000" then
-				change_horizontal_velocity <= to_signed(2, change_horizontal_velocity'length);
+				change_horizontal_velocity <= to_signed(3, change_horizontal_velocity'length);
 			elsif collision_speed_effect = "001" then
 				change_horizontal_velocity <= to_signed(1, change_horizontal_velocity'length);
 			elsif collision_speed_effect = "010" then
 				change_horizontal_velocity <= to_signed(0, change_horizontal_velocity'length);
 			elsif collision_speed_effect = "011" then
-				change_horizontal_velocity <= to_signed(-1, change_horizontal_velocity'length);
+				change_horizontal_velocity <= to_signed(-2, change_horizontal_velocity'length);
 			end if; 
 		end if;
 	 end process;
