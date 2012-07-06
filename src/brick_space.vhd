@@ -159,9 +159,13 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				if level = to_unsigned(0, levelT'length) then
-					alive <= (0=>"1000110001", others=>(others=>'0'));
-				else
-					alive <= (others=>(others=>'1'));
+					alive <= (0=>"1111111111", 1=>"1000000001", 2=>"1000000001", 3=>"1111111111");
+				elsif level = to_unsigned(1, levelT'length) then
+					alive <= (0=>"0001111000", 1=>"1111001111", 2=>"1111001111", 3=>"0001111000");
+				elsif level = to_unsigned(2, levelT'length) then
+					alive <= (0=>"1001001001", 1=>"0110000110", 2=>"0110000110", 3=>"1001001001");
+				elsif level = to_unsigned(3, levelT'length) then
+					alive <= (0=>"1100110011", 1=>"0011001100", 2=>"0011001100", 3=>"1100110011");
 				end if;
 			elsif unset_alive_old /= unset_alive then
 				alive(to_integer(unset_alive.y))(to_integer(unset_alive.x)) <= '0';
