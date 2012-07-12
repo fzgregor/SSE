@@ -38,13 +38,12 @@ signal ps2_strobe : std_logic;
 signal clk_25mhz : std_logic;
 signal collision_speed_effect : std_logic_vector(2 downto 0);
 
--- die Anzahl der Leben wird in der  Paddle Komponente angezeigt da die Behandlung im Top-modul es kpmplizierter macht
 --in game_logic benoetigte Signale von oder in anderen Komponenten :
-signal space_empty : std_logic; 									 --von space
-signal rst_level: std_logic; 	-- in space
-signal rgb_decider : std_logic; -- in top
-signal level_nr: levelT;-- in space
-signal lives : unsigned (2 downto 0); -- in Paddle 
+signal space_empty : std_logic; 									
+signal rst_level: std_logic; 	
+signal rgb_decider : std_logic; 
+signal level_nr: levelT;
+signal lives : unsigned (2 downto 0); 
 
 signal rgb_from_logic : rgbT;
 signal rgb_from_combiner : rgbT;
@@ -52,8 +51,17 @@ signal rgb_from_combiner : rgbT;
 signal rgb_x_639 : unsigned (9 downto 0);
 signal rgb_y_479 : unsigned (8 downto 0);
 
+signal rst_syn : std_logic := '0';
+
 
 begin
+
+	reset_sycnronizer : process(clk)
+	begin
+		if rising_edge(clk) then
+			rst_syn <= rst;
+		end if;
+	end process;
 
 	rgb_to_vga_component <= rgb_from_logic when rgb_decider = '1' else rgb_from_combiner;
 	live_indicator_inst : entity work.live_indicator
@@ -64,7 +72,7 @@ begin
 	
 	game_logic_inst : entity work.game_logic
 		port map(clk 					=> clk,
-					rst 					=> rst,
+					rst 					=> rst_syn,
 					rgb_x_639			=> rgb_x_639,
 					rgb_y_479			=> rgb_y_479,
 					rgb 					=> rgb_from_logic,
@@ -79,7 +87,7 @@ begin
 					lives					=> lives	
 					);
 	ps2_uart_inst : entity work.ps2_uart
-		port map(rst        => rst,
+		port map(rst        => rst_syn,
 			     clk        => clk,
 			     ps2_clk    => ps2_clk,
 			     ps2_dat    => ps2_data_raw,
@@ -94,7 +102,7 @@ begin
 			     clk_25mhz => clk_25mhz);
 	vga_inst : entity work.vga
 		port map(clk25             => clk_25mhz,
-			     reset             => rst,
+			     reset             => rst_syn,
 			     rgb_for_position  => vga_pixel,
 			     rgb_in            => rgb_to_vga_component,
 			     rgb_out           => rgb_to_screen,
