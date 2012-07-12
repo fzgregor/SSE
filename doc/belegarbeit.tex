@@ -1,7 +1,412 @@
-\documentclass{article}
-\usepackage{tikz}
+\documentclass{scrartcl}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{textcomp}
+\usepackage[colorlinks=false,pdfborder={0,0,0},bookmarks]{hyperref}
 \begin{document}
 
-\tikz \node [rectangle,draw,pin=left:pixel] {ball};
+\section{TODO}
+\begin{itemize}
+  \item Screenshot vom Spiel einbinden \& Textreferenz
+\end{itemize}
+
+\newpage
+
+\title{Belegarbeit Schaltkreis- und Systementwurf: Implementation des Spiels Brickout in VHDL auf dem Spartan 3 FPGA}
+
+\author{Ali Jaber (328 25 75),  Franz Gregor (353 34 79)\\
+Professur für VLSI-Entwurfssysteme, Diagnostik und Architektur,\\
+Institut für Technische Informatik,\\
+Technische Universität Dresden\\
+\\
+Betreuer: Dr.-Ing. Thomas Preußer}
+
+\date{\today}
+
+
+\maketitle \newpage
+
+\tableofcontents \newpage
+
+\section{Einleitung}
+
+\subsection{Das Spiel}
+Brickout ist ein Computerspiel, der drei Hauptkomponenten enthält:
+\begin{itemize}
+  \item Ein Schläger, der sich entlang den unteren Rand des Bildschirms bewegen kann
+  \item Mehrere Mauersteine die in der oberen Hälfte des Bildschirms verteilt sind
+  \item Ein Ball, der an den Ränder des Bildschirms,  an den Schläger, sowie an den Mauersteinen reflektieren kann
+\end{itemize}
+Der Spieler kann mittels Maus oder Tastatur den Schläger nach rechts und nach links bewegen, mit dem Ziel, dass der reflektierende Ball die Mauersteine trifft, die nach einer Kollision mit dem Ball verschwinden.
+Der Winkel mit dem der Ball vom Schläger reflektiert ist davon abhängig, im welchen Bereich der Ball der Schläger trifft.
+Damit kann der Spieler die Flugrichtung des Balls beeinflussen.
+Wenn der Spieler einen Ball verliert, bekommt er einen neuen, verliert aber nach dem Verlust einer bestimmten Anzahl von Bällen das Spiel.
+Ein Level gilt als gewonnen wenn alle Mauersteine abgeräumt wurden.
+Abbildung 1 zeigt ein Bild von unserer Realisierung des Spieles.
+
+
+\subsection{Einschränkungen unserer Implementierung}
+Es gibt viele Varianten von diesem Spiel mit vielen verschiedenen Features.
+Wie zum Beispiel dass Manche Mauersteine "`Bonus-Funktionen"' enthalten die beispielsweise den Schläger länger machen oder aus dem einen Ball zwei Bälle machen oder alle Mauersteine auf ein Mal verschwinden lassen.
+In unserer Variante des Spieles werden wir auf diese extra Features verzichten und das Spiel einfach halten in dem wir uns auf folgenden Funktionalitäten beschränken:
+\begin{itemize}
+  \item Der Spieler kann den Schläger nach rechts und nach links bewegen
+  \item Der Ball fliegt und reflektiert an dem Schläger, den Mauersteinen und den Bildschirm Rändern
+  \item Der Winkel mit dem der Ball vom Schläger reflektiert ist von der Kollisionsstelle abhängig
+  \item Wenn der Spielen einen Ball verliert bekommt er einen neuen, der in der Mitte des Schlägers befestigt ist bis er vom Spieler losgelassen wird
+  \item Der Spieler hat eine Bestimmte Anzahl von leben und muss um das Spiel zu gewinnen eine bestimmt Anzahl von Levels abschließen
+  \item Der Ball hat die Form eines Vierecks und nicht die eines Kreises.
+\end{itemize}
+
+
+\subsection{Bedienung unseres Spiels}
+Das Spiel wird mit nur vier Tasten bedient.
+
+Um das Spiel zu starten wird \textbf{ENTER} gedrückt.
+
+Während des Spiels kann das Paddle mit \textbf{4} nach Links und mit \textbf{6}
+nach Rechts bewegt werden. Mit \textbf{5} wird der Ball vom Paddle abgeschossen.
+
+Nachdem der Spieler gewonnen oder verloren hat kann das Spiel mit \textbf{BTN4}
+zurückgesetzt werden.
+
+\section{Aufbau}
+\subsection{Allgmein}
+Das Spiel wird durch den Spieler mit einem PS2 Nummernblock gesteuert und auf
+einem VGA Monitor ausgegeben.
+Dies schlägt sich auch im Aufbau des Spiels nieder.
+So sind bei Abstraktion der Programmlogik klar die Input (PS2) / Output (VGA)
+Komponenten und ihre Helferkomponeten (Clock-Generator) erkennbar.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=14.5cm]{brickout_top.png}
+	\caption{brickout top.png}
+\end{figure}
+
+
+\subsection{Ein- und Ausgabe}
+\subsubsection{Clock-Generator}
+Diese Komponente dient dazu die für das VGA Modul notwendige Frequenz von 25 Mhz aus der 50 MHz Frequenz des FPGAs abzuleiten.
+Das wird mit einem einfachen 1 : 2 Teiler realisiert.
+
+
+\subsubsection{VGA-Komponente}
+In der VGA Komponente wird die Ansteuerung des Monitors realisiert.
+Der Monitor wird durch diese Komponente mit Hilfe von fünf Signalleitungen angesteueret, die zur Farbauswahl und Positionssyncronisierung auf dem Bildschirm genutzt werden.
+Um die Zeitvorgaben der VGA Spezifikation (vgl. \cite[S.~23ff]{handbuch})
+einzuhalten nutzt die VGA Komponente den von der Clock-Generator bereitgestellten Takt von 25 Mhz.
+Der Programmlogik wird eine Pixel Koordinate zur Verfügung gestellt für welche sie die Farbe im RGB Format festlegt.
+Die VGA Komponente ist also vorallem für die Einhaltung der VGA Spezifikation verantwortlich.
+
+
+\subsubsection{PS2-Komponente}
+Die PS2 Komponente dient dazu, die Daten aus der Tastatur in den FPGA zu
+übertragen, und damit die Verwendung der Tastaturknöpfe zur Bewegung des
+Schlägers zu ermöglichen.
+Die Daten Übertragung passiert nur in eine Richtung, d.h. Die Komponente
+unterstützt das Senden von Daten vom FPGA zur Tastatur nicht.
+Der PS2 Stecker hat sechs Anschlüsse, davon aber nur zwei wichtig für die
+Programmierung und zwar einen für den Takt der in KHz Bereich liegt und einen
+für die Daten.
+Das Protokoll mit dem die Daten übertragen werden basiert auf diesen zwei
+Eingängen.
+Wenn die Tastatur nichts sendet sind beide Eingänge auf High.
+Wenn ein Wort gesendet wird wird die Daten Leitung auf Low gezogen.
+Die Takt Leitung reagiert darauf und erzeugt 11 Fallende Flanken.
+In dieser Zeit werden seriell in der Reihenfolge, ein Start-Bit, 8 Bit Daten,
+ein Parity-Bit zur Erkennung von Fehlern und anschließend ein Stop-Bit übertragen.
+Nach der Übertragung werden die Taktleitung und die Datenleitung wieder auf
+High gezogen.
+In der Komponente werden als erstes der Takt- und der Dateneingang mit dem
+Einsatz von zwei FlipFlops synchronisiert.
+Bei der Übertragung werden in einer Zustandsmaschine mit 11 Zuständen die oben
+genannten Bits erkannt und die 8 Bit Daten in einem Schieberegister geschoben.
+Die Ausgänge der Komponente sind zum einen der Inhalt des Registers, d.h. Die
+empfangenen ps2 Daten und zum anderen ein "`strobe"' Signal der ein Takt lang
+auf "`1"'  gesetzt wird wenn die Übertragen erfolgreich abgeschlossen ist.
+
+
+\subsection{Spiellogik}
+\subsubsection{Allgemein}
+Die Spiellogik ist aus mehreren Komponeneten aufgebaut. Diese kümmern sich
+zusammen um alles was nicht mit der Ein- und Ausgabe Umwandlung für die
+Außenwelt zu tun hat. Einen Überblick gibt Abbildung \ref{spiel_komponenten},
+die die Komponenten sowie vereinfacht und unvollständig auch derren
+Verknüpfungen darstellt.
+
+Die Komponenten können in sichtbare Komponenten (Ball, Paddle,
+Live\_Indicator, Brick\_Space und Game\textunderscore Logic) die dem Nutzer
+Informationen über den Zustand des Spiels vermitteln, kollidierbare Komponenten (Paddle,
+Screen und Brick\_Space) die die Bewegung des Balls beeinflussen können und
+Helferkomponenten (Collision\_Combiner, RGB\_Combiner) die zur Realisierung
+notwendig sind unterteilt werden.
+
+Eine Sonderstellung haben die Game\_Logic und Live\_Indicator Komponenten.
+Während die anderen Komponenten vorallem dafür sorgen, dass das Spiel während
+eines Laufs so funktioniert wie erwartet nehmen sie sich der Tatsache an, dass
+ein Spieler nur vier mal den Ball verlieren darf und er ein neues Level zu sehen
+bekommt wenn er eines abgeschlossen hat.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=14.5cm]{Spiel_komponenten.png}
+	\caption{Komponenten der Spiellogik}
+	\label{spiel_komponenten}
+\end{figure}
+
+
+\subsubsection{Ball-Komponente}
+Der Ball bewegt sich über den Bildschirm.
+Wenn er ein sichtbares (Bricks, Paddle) oder unsichtbares (Bildschirmrand) Objekt berühert reflektivert er an diesem.
+Wenn er das Paddle in bestimmten Bereichen trifft ändert er seine Geschwindigkeit.
+All dies geschieht im Zustand MOVING.
+Außerdem kann er den sichtbaren Bereich am unterem Rand des Bildschirms – unterhalb des Paddles – verlassen, dann stoppt er seine Bewegung und zeigt an das er tot ist (Zustand DEATH).
+Daraufhin kann er auf das Paddle gesetzt werden und ist dort so lange gefangen bis das Paddle ihn abschießt und er sich wieder über den Bildschirm bewegt (Zustand CATCHED).
+Neben diesen fachlichen Funktionen kümmert sich die Ball Komponente auch um das korrekt Anzeigen des Balls auf dem Bildschirm.
+
+Zustände
+Drei Zustände können vom Ball eingenommen werden.
+Das sind MOVING (der Ball bewegt sich über den Bildschirm), DEATH (der Ball hat den Bildschirm am unterem Rand verlassen und ist damit deaktiviert) und CATCHED (der Ball befindet sich auf dem Paddle und wird mit diesem bewegt).
+Die Zustände werden in einer Zustandsmaschine in Abhängigkeit der Ballposition und des vom Paddle ausgehenden Setsignals eingenommen.
+Bewegung
+Die Bewegung des Balls wird in drei unterschiedliche Konzepte zerlegt.
+Zum einen durch einen Zähler, zum anderen durch zwei Signalen die die Geschwindigkeit in der jeweiligen Ebene enthalten, die Zahlenwerte dieser Signale geben an bei welchem Bit des Zählers der Wechsel von 0 zu 1 einen Bewegungsimpuls auslöst.
+Und als Letztes zwei Signale die festlegen ob die Position des Balls eine Stelle weiter- oder zurückgesetzt wird wenn der Bewegungsimpuls ausgelöst wird.
+
+
+Kollisionen
+Durch unsere Realisierung der Bewegung ist die Kollisionsfunktion relativ einfach.
+Der Ball erhält von allen Komponenten einen kombinierten Kollisionsvektor.
+Dieser gibt an ob der Ball mit einer (oder mehreren) Komponenten kollidiert ist und ob diese Kollsion an einer vertikalen oder horizontalen Ebene stattfand.
+Der Ball reagiert auf eine Kollision indem er die orthogonal zur Kollosionsebene laufende Bewegung umkehrt.
+Das entspricht einfach dem negieren des Richtungssignals.
+
+Geschwindigkeitseffekt
+
+Durch den Geschwindigkeitseffekt kann der Nutzer die Geschwindigkeit des Balls beeinflussen.
+Dies geschieht indem er das Paddle so positioniert, dass der Ball den Randbereich des Paddles trifft.
+Dies wird von Paddle und Ball erkannt und je nach aktueller Bewegungsrichtung und Randbereich (links/rechts) wird die horizontale Geschwindigkeit des Paddles halbiert oder verdoppelt.
+Zur Veranschaulichung des Effekts kann man sich vorstellen, dass das Paddle kein Rechteck ist sondern oben abgeschliffene Ecken hat.
+Wenn der Ball nun an einer schrägen Kante statt einer horizontalen reflektiert wird fliegt er in einem anderem Winkel weiter.
+Dies wird durch die Änderung der horizontalen Geschwindigkeit erreicht.
+Umgesetzt wird die Geschwindigkeitsänderung durch indem der Wert des horizontalen Geschwindigkeitssignals erhöht bzw. verringert wird und damit auf der horizontale Bewegungsimpuls durch die Änderung eines höher- oder niederwertigen Bits des Zählers ausgelöst wird.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[height=20cm]{ball_sm.png}
+	\caption{SM-Chart der Ball Zustandsmaschine}
+\end{figure}
+
+\subsubsection{Brick\_Space-Komponente}
+Die Brick\_Space Komponente stellt die Funktionalität der Bricks her. Das sind
+die folgenden:
+\begin{itemize}
+  \item Anzeigen der lebenden Bricks auf dem VGA Monitor
+  \item Ausgabe der Kollisionsvektors und Kollisionserkennung für alle Bricks
+  \item Deaktivieren/Töten eines Bricks nachdem der Ball den Brick berühert hat
+  \item Erkennen das keine lebenden Bricks (mehr) vorhanden sind
+  \item Laden der Level
+\end{itemize}
+
+Um diese Funktionen bereit stellen zu können besitzt der Brick\_Space ein
+multidimensionales Array von der Größe 4 mal 10. Für den in 4 Reihen und 10
+Spalten unterteilen oberen Bereich des Spielfelds, in dem sich in jedem Feld
+ein Brick befindet. Die Elemente des Arrays sind Werte vom Typ STD\_LOGIC die
+repräsentieren ob der bezeichnete Brick lebend oder tot ist. Daher trägt dieses
+Array den Namen Alive.
+
+Für die meisten Funktionalitäten müssen die beiden Eingangssignale der
+Komponente die Positionsinformationen enthalten (rgb\_for\_position und
+ball\_position) auf Indizes des Alive Arrays umgesetzt werden. Für jedes dieser
+beiden Eingangssignale werden drei Signale in der Komponente berechnet. Die zwei
+Indizes des multidimensionalem Arrays und ein weiteres Signal welches angibt ob
+die Indizes valid sind. Das heißt die Position des Eingangssignals liegt
+tatsächlich auf einem Brick und z.B. nicht in der Lücke zwischen zwei Bricks.
+
+Die Bricks haben bestimmte Größen, die eine hardwareeffiziente Realisierung
+ermöglichen. Das sei am Beispiel der horizontalen Länge der Bricks gezeigt:
+
+Ein Brick ist 24 Pixel lang und auf ihn folgen acht Pixel Lücke. Zusammen
+ist diese Einheit also 32 Pixel lang. Für die Umsetzung bedeuted dies, dass
+die angegebene Pixel Position durch 32 geteilt werden muss um den Index des
+Bricks zu berechnen. Das heißt durch einen Rechtsshift des binären
+Positionssignals um fünf erhält man den Index des Bricks. Da das Positionssignal
+aber auch gerade auf die Lücke hinter dem Brick zeigen kann muss dies noch
+geprüft werden und das Signal unter Umständen als nicht valid markiert werden.
+Die Prüfung ist simpel: Wenn die fünte und vierte Stelle des binären, offset
+bereinigten Positionssignal ungleich '11' ist ist das Signal valid. Die
+Überlegung dahinter ist, dass die Lücke ab der binären Zahl '11000' beginnt und
+ab '100000' schon der nächste Brick ist.
+
+Ähnlich wird in der vertikalen Ebene verfahren. Die Validitätssignale werden
+zusammengefasst und die Berechnung ist abgeschlossen.
+
+Die Kollisionserkennung arbeitet analog. Eine vertikale Kollision liegt
+beispielweise vor wenn die vier niedrigwertigsten Bits des horizontale, offset
+bereinigte Positionssignal alle gleich null (linke Seite des Bricks) oder
+alle gleich eins (rechte Seite des Bricks) sind, das aktuelle Positionssignal
+einen validen Index produziert und dieser auf ein lebendes Brick zeigt.
+
+Durch das Konzept des validen Positionssignals gestaltet sich auch das Zeichnen
+der Bricks recht einfach. Wenn das RGB Positionssignal einen validen Index
+generieren würde wird ein Farbwert ausgegeben sonst nicht.
+
+Die Komponente lädt immer wenn sie resettet wird ein (neues) Level, indem das
+Alive Array mit vorgebenen Werten gefüllt wird.
+Das Level kann von außen über ein Signal ausgewählt werden.
+
+\subsubsection{Paddle-Komponente}
+Diese Komponente realisiert den Schläger und erfüllt folgende Funktionalitäten:
+
+\begin{itemize}
+  \item Die Darstellung des Schlägers auf dem Bildschirm:
+  Die aus der VGA Komponente kommenden X und Y Positionen der Pixel detektieren
+  die aktuelle Position des Schlägers und ein 3 Bit-langes rgb Signal wird
+  entsprechend am Ausgang gesetzt und an die rgb-combiner Komponente
+  weitergeleitet, die das gesamte rgb Signal aus den verschiedenen Komponenten
+  zu einem einzigen rgb Ausgangssignal der gesamten Anwendung zusammenfasst.
+  \item Die Bewegung des Schlägers nach rechts und nach links:
+  Dafür werden die Eingangssignale, die aus der PS2 Komponente kommen bewertet.
+  Die Taste mit der Nummer 4 ist für die Rechtsbewegung reserviert und die mit
+  der Nummer 6 für die Linksbewegung. Eine Zustandsmaschine erkennt die
+  „scancodes“ der oben genannten Tasten. Ein erkannter „Make-code“ startet die
+  Bewegung des Schläger mit einer bestimmten Geschwindigkeit und ein erkannter
+  „Break-code“ stoppt sie. Die Geschwindigkeit wird aus dem globalen Takt mit
+  einem einfachen 1 : N  Teiler realisiert.
+  \item Die Kollision mit dem Ball in einem bestimmten Bereich des Schlägers
+  Der Eingassignal mit der aktuellen Ballposition wird mit der aktuellen
+  Position des Schlägers verglichen. Wenn eine Kollision erkannt wird, wird
+  ein Ausgangssignal an die collision-combiner Komponente weitergeleitet, wo
+  die gesamten Kollisionen aus allen Komponenten bewerte werden. Gleichzeitig
+  wird erkannt, an welcher Stelle des Schlägers hat die Kollision statt
+  gefunden. Dafür ist der Schläger in 5 Bereichen geteilt, wie in Abbildung
+  Nummer zu sehen ist. Diese Information wird an die Ball Komponente
+  weitergeleitet und dort den Winkel mit dem Dell Ball reflektiert
+  beeinflussen.
+  \item Das fangen und schießen eines Balles:
+  Wenn der Spieler einen Ball verliert, bekommt er einen neuen. Dafür wird ein
+  Eingangssignal aus der Ball Komponente bewertet der besagt, wann ein Ball „tot“
+  ist. Wenn ein toter Ball erkannt ist, wird ein neuer Ball in der Mitte des
+  Schlägers gesetzt und behält seine Position trotz der Bewegung des Schlägers
+  solange bis er mit der Tastatur Taste mit der Nummer 5 geschossen wird. Das
+  wird wieder durch Bewertung des Eingangssignale aus der PS2 Komponente
+  realisiert.
+  \begin{figure}[h!]
+    \centering
+    \includegraphics{Paddle_Bereiche.png}
+    \caption{Paddle Bereiche.png}
+  \end{figure}
+\end{itemize}
+\subsubsection{Screen-Komponente}
+Dies ist eine einfache Komponente.
+Der Eingangssignal mit der aktuellen Ballposition wird beobachtet.
+Bei einer Kollision mit dem linken oder dem rechten Rand  des Bildschirms, wird
+ein Vertikale Kollision am Ausgang gemeldet und bei einer Kollision mit dem
+oberen Rand wird eine horizontale Kollision gemeldet.
+Der Ausgangssignal fließt wieder in der collision-combiner Komponente die das
+weiterverarbeitet.
+
+
+\subsubsection{Game\_Logic-Komponente}
+In dieser Komponente wird die Spiellogik verwaltet.
+Sie besteht im groben aus einer Zustandsmaschine die 5 Zustände besitzt.
+Der erste Zustand ist der Start Zustand in dem auf dem Bildschirm der Name des
+Spieles dargestellt wird.
+Dieser Zustand wird verlassen wenn der Spieler die Enter Taste drückt.
+Der zweite Zustand ist dazu da um die Nummer des nächsten Levels für ungefähr 2
+Sekunden zu zeigen, z.B. "`Level 2"' . Danach wird er Verlassen zum nächsten
+Zustand. In dem dritten Zustand findet das eigentliche Spielen statt und es wird
+auf zwei Eingangssignale reagiert. Das erste kommt aus der Ball Komponente und
+besagt wann ein Ball tot ist damit die Anzahl der Leben dekrementiert wird. Das
+zweite Signal kommt aus der Brick-space Komponente und meldet wann alle
+Mauersteine in einem Level abgeräumt sind. Damit kann der nächste Level
+anfangen. Der vierte Zustand mit wird erreicht wenn alle Level gewonnen sind
+und es wird auf dem Bildschirm ein "`You Win"' angezeigt. Der fünfte Zustand
+wird dagegen erreicht wenn alle Leben verbraucht sind und es wird ein "`Game
+Over"' angezeigt. Die letzten beiden Zustände werden nur mit einem Reset
+verlassen. Die benötigte Zeitdauer von ungefähr 2 Sekunden wird wieder mit einem
+1 : N  Teiler des globalen Taktes realisiert. Da die Anzahl der benötigten
+Buchstaben gering war, und um den Aufwand zu sparen der damit hängt Buchstaben
+auf dem VGA Bildschirm zu schreiben, haben wir uns entschieden, die Pixel
+Positionen für jeden der benötigten Buchstaben einzeln zu berechnen und an den
+rgb Ausgangssignal zu übergeben. Der rgb Ausgangssignal der Gesamtanwendung wird
+in dem dritten Zustand aus der rgb-combiner Komponente entnommen, die viele rgb
+Signale aus verschiedenen Komponenten kombiniert und in den anderen vier
+Zuständen aus der game-logic Komponente, da keine andere Einflüße aus anderen
+Komponenten vorhanden sind.
+
+
+\subsubsection{Live\_Indicator-Komponente}
+In dieser Komponente die Anzahl der verbleibenden Leben beobachtet und als Vierecke auf dem Bildschirm oben rechts angezeigt.
+Der rgb Ausgangssignal wird hier auch an die rgb-combiner Komponente weitergeleitet.
+
+
+\subsubsection{Combiner-Komponente(n)}
+Der Combiner ist eine generische Komponente die eine einstellbare Anzahl von
+m-stelligen Signalen bitweise oder verknüpft und die m-stellige Verknüpfung
+ausgibt.
+
+Wir nutzten diese Komponente an zwei Stellen.
+Einmal um die RGB Farbwerte der sichtbaren Komponenten (Ball, Brick\_Space,
+Paddle, Live\_Indicator) zusammen zu fassen und diesen Wert dann an die VGA
+Komponente zu geben.
+Und um die Collisionsvektoren die aus der Paddle, Brick\_Space und der Screen
+Komponente stammen zu kombinieren und an die Ball Komponente zu geben.
+
+Die Oder-Verknüpfung ist bei diesen Signalen zulässig.
+Da die sichtbaren Komponenten nicht übereinander liegen (und wann dann nur für
+minimal Bruchteile einer Sekunde) sind alle Eingangssignale in die Combiner
+Komponente gleich Null bis auf eines das den Farbwert der aktuell angezeigten
+Komponente enthält. Durch die Oder-Verknüpfung wird genau dieser eine Farbwert
+der aktuell angezeigten Komponente vom Combiner ausgegeben.
+Die Oder-Verknüpfung des Kollisionsvektors funktioniert weil es unerheblich ist
+mit welcher Komponente, sondern nur interessiert ob bzw. wie
+(horizontal oder vertikal) der Ball kollidiert und diese Information durch die
+Oder-Verknüpfung der Eingangssignale erhalten bleibt.
+
+Realisert wird der Combiner durch rekursives in einander schachteln von Untercombinern.
+So dass jeder Combiner genau zwei m-stellige Signale verknüpft.
+Und durch Verschachtelung beliebig viele Signale kombiniert werden können.
+
+
+\section{Auswertung}
+Iterationen
+
+
+
+\section{Glossar}
+\begin{description}
+\item[Brick] Ein Brick ist ein Stein im oberem Bereich des Spielfeld. Wenn der
+Ball einen Brick berühert wir dieser entfernt. Ein Brick ist entweder
+lebend oder aktiv (er wird angezeigt und der Ball reflektiert an seinen
+Rändern) oder tot (er wird nicht angezeigt und der Ball durch ihn nicht
+beeinflusst).
+Wenn das Spielfeld keine Bricks mehr enthält hat der Spieler das Level erfolgreich durchgespielt.
+\item[Geschwindigkeitseffekt] Beschreibt die Beeinflussung des Winkels und der
+Geschwindigkeit des Balls durch den Spieler mit Hilfe des Paddels. Dass Paddle
+besitzt mehrere Bereiche die die Bewegung des Balls beeinflussen können. Der
+Spieler kann diesen Effekt durch geschicktes steuern des Paddels nutzen um zu
+Gewinnen.
+\item[Paddle] Das Paddle ist der ein bewegbarer Schläger am unterem Rand des
+Spielfelds. Seine Position ist durch den Spieler steuerbar. Es wird genutzt um
+zu verhindern das der Ball an das untere Ende des Spielfelds kommt und damit
+verloren ist. Mit Hilfe des Geschindigkeitseffekts kann der Spieler die
+Geschwindigkeit und den Winkel des Balls beeinflussen.
+\item[Lauf] Ein Lauf
+\end{description}
+
+\listoffigures
+
+\begin{thebibliography}{9}
+
+\bibitem{handbuch}
+  Xilinx, Inc,
+  \emph{Spartan-3 Starter Kit Board User Guide}.
+  UG130 (v1.0),
+  28 April 2004.
+
+\end{thebibliography}
 
 \end{document}
