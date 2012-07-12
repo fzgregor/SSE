@@ -110,12 +110,12 @@ begin
 			ball_index_valid <= ball_index_valid_x and ball_index_valid_y;
 			-- these are the collision lines
 			-- if the ball is on one of these lines and the brick is alive we're colliding
-			if ball_position_without_offset_y(2 downto 0) = "000" then
+			if ball_position_without_offset_y(2 downto 0) = "111" or ball_position_without_offset_y(2 downto 0) = "000" then
 				horizontal_collision_line <= '1';
 			else
 				horizontal_collision_line <= '0';
 			end if;
-			if(ball_position_without_offset_x(4 downto 0) = "11000" or ball_position_without_offset_x(4 downto 0) = "00000") then
+			if(ball_position_without_offset_x(4 downto 0) = "10111" or ball_position_without_offset_x(4 downto 0) = "00000") then
 				vertical_collision_line <= '1';
 			else
 				vertical_collision_line <= '0';
@@ -159,13 +159,13 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				if level = to_unsigned(0, levelT'length) then
-					alive <= (0=>"1111111111", 1=>"1000000001", 2=>"1000000001", 3=>"1111111111");
+					alive <= (0=>"1110111011", 1=>"1101110111", 2=>"1011101110", 3=>"0111011101");
 				elsif level = to_unsigned(1, levelT'length) then
 					alive <= (0=>"0001111000", 1=>"1111001111", 2=>"1111001111", 3=>"0001111000");
 				elsif level = to_unsigned(2, levelT'length) then
-					alive <= (0=>"1001001001", 1=>"0110000110", 2=>"0110000110", 3=>"1001001001");
+					alive <= (0=>"1001111001", 1=>"0110000110", 2=>"0110000110", 3=>"1001111001");
 				elsif level = to_unsigned(3, levelT'length) then
-					alive <= (0=>"1100110011", 1=>"0011001100", 2=>"0011001100", 3=>"1100110011");
+					alive <= (0=>"1111111111", 1=>"1000000001", 2=>"1000000001", 3=>"1111111111");
 				end if;
 			elsif unset_alive_old /= unset_alive then
 				alive(to_integer(unset_alive.y))(to_integer(unset_alive.x)) <= '0';
